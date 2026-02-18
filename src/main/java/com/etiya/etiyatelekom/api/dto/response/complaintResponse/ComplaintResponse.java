@@ -1,0 +1,26 @@
+package com.etiya.etiyatelekom.api.dto.response.complaintResponse;
+
+import lombok.*;
+
+import java.time.OffsetDateTime;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ComplaintResponse {
+
+    private Long id;
+
+    private Long customerId;
+    private Long subscriptionId;
+
+    private String title;
+    private String description;
+
+    private OffsetDateTime createdAt;
+
+    private Long aiAnalysisId;
+    private Long ticketId;
+}

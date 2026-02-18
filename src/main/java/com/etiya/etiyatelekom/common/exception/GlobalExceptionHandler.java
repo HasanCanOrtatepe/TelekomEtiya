@@ -1,0 +1,52 @@
+package com.etiya.etiyatelekom.common.exception;
+
+import com.etiya.etiyatelekom.common.exception.exceptions.ResourceAlreadyExistsException;
+import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.*;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiError> handleNotFound(ResourceNotFoundException ex, HttpServletRequest req) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), req.getRequestURI(), null);
+    }
+
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleAlreadyExists(ResourceAlreadyExistsException ex, HttpServletRequest req) {
+        return build(HttpStatus.CONFLICT, ex.getMessage(), req.getRequestURI(), null);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError fe : ex.getBindingResult().getFieldErrors()) {
+            errors.put(fe.getField(), fe.getDefaultMessage());
+        }
+        return build(HttpStatus.BAD_REQUEST, "Validation failed", req.getRequestURI(), errors);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleOther(Exception ex, HttpServletRequest req) {
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", req.getRequestURI(), null);
+    }
+
+    private ResponseEntity<ApiError> build(HttpStatus status, String message, String path, Map<String, String> val) {
+        ApiError body = ApiError.builder()
+                .timestamp(OffsetDateTime.now())
+                .status(status.value())
+                .message(message)
+                .path(path)
+                .validationErrors(val)
+                .build();
+        return ResponseEntity.status(status).body(body);
+    }
+}
