@@ -19,6 +19,5 @@ public class EmailNotificationCreateRequest {
     private String recipientEmail;
 
     @NotBlank
-    @Pattern(regexp = "^(QUEUED|SENT|FAILED)$", message = "status must be QUEUED, SENT or FAILED")
     private String status;
 }

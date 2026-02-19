@@ -15,13 +15,9 @@ public class AIAnalysisUpdateRequest {
     private String summary;
 
     @NotBlank
-    @Pattern(regexp = "^(LOW|MEDIUM|HIGH|URGENT)$",
-            message = "priority must be LOW, MEDIUM, HIGH or URGENT")
     private String priority;
 
     @NotBlank
-    @Pattern(regexp = "^(LOW|MEDIUM|HIGH)$",
-            message = "riskLevel must be LOW, MEDIUM or HIGH")
     private String riskLevel;
 
     @NotNull

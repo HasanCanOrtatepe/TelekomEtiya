@@ -2,8 +2,10 @@ package com.etiya.etiyatelekom.service.abst;
 
 import com.etiya.etiyatelekom.api.dto.request.subscriptionRequest.SubscriptionCreateRequest;
 import com.etiya.etiyatelekom.api.dto.request.subscriptionRequest.SubscriptionUpdateRequest;
+import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketAssignRequest;
 import com.etiya.etiyatelekom.api.dto.response.subscriptionResponse.SubscriptionListResponse;
 import com.etiya.etiyatelekom.api.dto.response.subscriptionResponse.SubscriptionResponse;
+import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketResponse;
 
 public interface SubscriptionService {
 
@@ -19,5 +21,6 @@ public interface SubscriptionService {
 
     SubscriptionListResponse getByStatus(String status);
 
-    void deactivate(Long id); // status=PASSIVE
+    void deactivate(Long id);
+
 }

@@ -10,12 +10,14 @@ import com.etiya.etiyatelekom.repository.AIAnalysisRepository;
 import com.etiya.etiyatelekom.repository.ComplaintRepository;
 import com.etiya.etiyatelekom.service.abst.AIAnalysisService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -70,11 +72,17 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
 
     @Override
     public AIAnalysisResponse create(Long complaintId) {
+        log.info("1 Ai");
+
         Complaint complaint=complaintRepository.findById(complaintId)
                 .orElseThrow(()->new ResourceNotFoundException("Complaint","Id",complaintId));
 
+        log.info("2 Ai");
+
         Long predictedServiceDomainId = 1L;
         Long predictedDepartmentId = 1L;
+
+        log.info("3 Ai");
 
 
         AIAnalysis aiAnalysis= AIAnalysis.builder()
@@ -86,11 +94,17 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
                 .summary("Deneme Yapıyorum")
                 .build();
 
+        log.info("4 Ai");
+
         aiAnalysisRepository.save(aiAnalysis);
+
+        log.info("5 Ai");
 
         AIAnalysisResponse aiAnalysisResponse = modelMapperService.forResponse().map(aiAnalysis,AIAnalysisResponse.class);
         aiAnalysisResponse.setServiceDomainId(predictedServiceDomainId);
         aiAnalysisResponse.setDepartmentId(predictedDepartmentId);
+
+        log.info("6 Ai");
 
         return aiAnalysisResponse;
     }

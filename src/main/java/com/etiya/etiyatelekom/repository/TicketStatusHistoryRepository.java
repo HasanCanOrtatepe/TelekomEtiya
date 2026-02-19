@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface TicketStatusHistoryRepository extends JpaRepository<TicketStatusHistory,Long> {
     List<TicketStatusHistory> findByTicketId(Long ticketId);
+    List<TicketStatusHistory> findByAgentId(Long agentId);
 
 }

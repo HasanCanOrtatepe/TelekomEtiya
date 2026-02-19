@@ -9,6 +9,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class TicketStatusHistoryResponse {
 
     private Long id;
@@ -18,4 +19,5 @@ public class TicketStatusHistoryResponse {
     private String toStatus;
 
     private OffsetDateTime changedAt;
+    private Long AgentId;
 }

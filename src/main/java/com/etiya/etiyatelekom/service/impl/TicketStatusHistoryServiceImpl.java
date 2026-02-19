@@ -9,11 +9,13 @@ import com.etiya.etiyatelekom.entity.TicketStatusHistory;
 import com.etiya.etiyatelekom.repository.TicketStatusHistoryRepository;
 import com.etiya.etiyatelekom.service.abst.TicketStatusHistoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -34,35 +36,80 @@ public class TicketStatusHistoryServiceImpl implements TicketStatusHistoryServic
     @Override
     public TicketStatusHistoryListResponse getByTicket(Long ticketId) {
 
-        if (!ticketStatusHistoryRepository.findByTicketId(ticketId).isEmpty()){
+        if (ticketStatusHistoryRepository.findByTicketId(ticketId).isEmpty()){
             throw new ResourceNotFoundException();
         }
         List<TicketStatusHistory> ticketStatusHistories=ticketStatusHistoryRepository.findByTicketId(ticketId);
         List<TicketStatusHistoryResponse> ticketStatusHistoryResponses=ticketStatusHistories.stream()
-                .map(ticketStatusHistory -> modelMapperService.forResponse().map(ticketStatusHistories,TicketStatusHistoryResponse.class))
+                .map(ticketStatusHistory -> TicketStatusHistoryResponse.builder()
+                        .changedAt(ticketStatusHistory.getChangedAt())
+                        .fromStatus(ticketStatusHistory.getFromStatus())
+                        .ticketId(ticketStatusHistory.getTicket().getId())
+                        .id(ticketStatusHistory.getId())
+                        .toStatus(ticketStatusHistory.getToStatus())
+                        .AgentId(ticketStatusHistory.getAgentId())
+                        .build())
                 .toList();
 
         TicketStatusHistoryListResponse ticketStatusHistoryListResponse=TicketStatusHistoryListResponse.builder()
                 .items(ticketStatusHistoryResponses)
                 .count(ticketStatusHistoryResponses.size())
                 .build();
+
+        return ticketStatusHistoryListResponse;
+    }
+
+    @Override
+    public TicketStatusHistoryListResponse getByAgent(Long AgentId) {
+
+        if (ticketStatusHistoryRepository.findByAgentId(AgentId).isEmpty()){
+            throw new ResourceNotFoundException();
+        }
+        List<TicketStatusHistory> ticketStatusHistories=ticketStatusHistoryRepository.findByAgentId(AgentId);
+        List<TicketStatusHistoryResponse> ticketStatusHistoryResponses=ticketStatusHistories.stream()
+                .map(ticketStatusHistory -> TicketStatusHistoryResponse.builder()
+                        .changedAt(ticketStatusHistory.getChangedAt())
+                        .fromStatus(ticketStatusHistory.getFromStatus())
+                        .ticketId(ticketStatusHistory.getTicket().getId())
+                        .id(ticketStatusHistory.getId())
+                        .toStatus(ticketStatusHistory.getToStatus())
+                        .AgentId(ticketStatusHistory.getAgentId())
+                        .build())
+                .toList();
+
+        TicketStatusHistoryListResponse ticketStatusHistoryListResponse=TicketStatusHistoryListResponse.builder()
+                .items(ticketStatusHistoryResponses)
+                .count(ticketStatusHistoryResponses.size())
+                .build();
+
         return ticketStatusHistoryListResponse;
     }
 
     @Override
     public TicketStatusHistoryListResponse getAll() {
-        if (!ticketStatusHistoryRepository.findAll().isEmpty()){
+        if (ticketStatusHistoryRepository.findAll().isEmpty()){
             throw new ResourceNotFoundException();
         }
         List<TicketStatusHistory> ticketStatusHistories=ticketStatusHistoryRepository.findAll();
+        ticketStatusHistories.forEach(ticketStatusHistory -> log.info(ticketStatusHistories.toString()));
         List<TicketStatusHistoryResponse> ticketStatusHistoryResponses=ticketStatusHistories.stream()
-                .map(ticketStatusHistory -> modelMapperService.forResponse().map(ticketStatusHistories,TicketStatusHistoryResponse.class))
+                .map(ticketStatusHistory -> TicketStatusHistoryResponse.builder()
+                        .changedAt(ticketStatusHistory.getChangedAt())
+                        .fromStatus(ticketStatusHistory.getFromStatus())
+                        .ticketId(ticketStatusHistory.getTicket().getId())
+                        .id(ticketStatusHistory.getId())
+                        .toStatus(ticketStatusHistory.getToStatus())
+                        .AgentId(ticketStatusHistory.getAgentId())
+                        .build())
                 .toList();
+
+        ticketStatusHistoryResponses.forEach(ticketStatusHistoryResponse -> log.info(ticketStatusHistoryResponse.toString()));
 
         TicketStatusHistoryListResponse ticketStatusHistoryListResponse=TicketStatusHistoryListResponse.builder()
                 .items(ticketStatusHistoryResponses)
                 .count(ticketStatusHistoryResponses.size())
                 .build();
+
         return ticketStatusHistoryListResponse;
     }
 }

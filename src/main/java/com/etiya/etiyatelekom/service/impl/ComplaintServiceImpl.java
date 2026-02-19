@@ -11,6 +11,7 @@ import com.etiya.etiyatelekom.entity.*;
 import com.etiya.etiyatelekom.repository.*;
 import com.etiya.etiyatelekom.service.abst.AIAnalysisService;
 import com.etiya.etiyatelekom.service.abst.ComplaintService;
+import com.etiya.etiyatelekom.service.abst.TicketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
@@ -37,27 +38,38 @@ public class ComplaintServiceImpl implements ComplaintService {
     private final DepartmentRepository departmentRepository;
     private final ServiceDomainRepository serviceDomainRepository;
     private final TicketRepository ticketRepository;
+    private final TicketStatusHistoryRepository ticketStatusHistoryRepository;
 
 
     @Override
     public ComplaintResponse create(ComplaintCreateRequest request) {
 
+        log.info(" 1  Burda");
+
+
         Customer customer =customerRepository.findById(request.getCustomerId())
                 .orElseThrow(()-> new ResourceNotFoundException("Customer","Id",request.getCustomerId()));
+
+        log.info(" 2  Burda ");
+
 
         Complaint complaint=modelMapperService.forRequest().map(request,Complaint.class);
         complaint.setCustomer(customer);
         complaint.setCreatedAt(OffsetDateTime.now());
 
+        log.info(" 3  Burda ");
+
         if(request.getSubscriptionId()!=null){
             complaint.setSubscription(subscriptionRepository.findById(request.getSubscriptionId())
                     .orElseThrow(()->new ResourceNotFoundException("Subscription","Id", request.getSubscriptionId())));
         }
-        complaintRepository.save(complaint);
 
+        log.info(" 5  Burda ");
+        complaintRepository.save(complaint);
         AIAnalysisResponse aiAnalysisResponse=aiAnalysisService.create(complaint.getId());
 
-        log.info("Burda Hata var");
+        log.info(" 4  Burda ");
+
         Department department=departmentRepository.findById(aiAnalysisResponse.getDepartmentId())
                 .orElseThrow(()->new ResourceNotFoundException("Department","Id",aiAnalysisResponse.getDepartmentId()));
 
@@ -75,10 +87,27 @@ public class ComplaintServiceImpl implements ComplaintService {
                 .serviceDomain(serviceDomain)
                 .build();
 
+        log.info(" 6  Burda ");
         ticketRepository.save(ticket);
+        AIAnalysis analysis= AIAnalysis.builder()
+                .complaint(complaint)
+                .confidenceScore(aiAnalysisResponse.getConfidenceScore())
+                .createdAt(aiAnalysisResponse.getCreatedAt())
+                .priority(aiAnalysisResponse.getPriority())
+                .riskLevel(aiAnalysisResponse.getRiskLevel())
+                .summary(aiAnalysisResponse.getSummary())
+                .id(aiAnalysisResponse.getId())
+                .build();
+
+        complaint.setAiAnalysis(analysis);
+        complaint.setTicket(ticket);
+
+        complaintRepository.save(complaint);
 
         ComplaintResponse complaintResponse=modelMapperService.forResponse().map(complaint,ComplaintResponse.class);
+        changeticket(ticket.getId(),null,"Started");
 
+        log.info(" 7  Burda ");
         return complaintResponse;
     }
 
@@ -142,4 +171,25 @@ public class ComplaintServiceImpl implements ComplaintService {
         complaintRepository.delete(complaint);
 
     }
+
+    private void changeticket(Long id,String firstStatus,String secondStatus){
+
+        log.info("1 changeticket");
+
+        Ticket ticket=ticketRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Ticket","Id",id));
+
+        log.info("2 changeticket");
+
+
+        TicketStatusHistory ticketStatusHistory=TicketStatusHistory.builder()
+                .fromStatus(firstStatus)
+                .ticket(ticket)
+                .changedAt(OffsetDateTime.now())
+                .toStatus(secondStatus)
+                .build();
+        log.info("3 changeticket");
+        ticketStatusHistoryRepository.save(ticketStatusHistory);
+        log.info("4 changeticket");
+    }
+
 }

@@ -11,12 +11,14 @@ import com.etiya.etiyatelekom.entity.*;
 import com.etiya.etiyatelekom.repository.*;
 import com.etiya.etiyatelekom.service.abst.TicketService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -123,8 +125,11 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketResponse updateStatus(Long ticketId, TicketUpdateStatusRequest request) {
 
+
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", "id", ticketId));
+
+        changeticket(ticketId,ticket.getStatus(),request.getStatus());
 
         ticket.setStatus(request.getStatus());
 
@@ -160,10 +165,13 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", "id", ticketId));
 
+
         ticket.setStatus("CLOSED");
         ticket.setClosedAt(OffsetDateTime.now());
 
         Ticket saved = ticketRepository.save(ticket);
+        changeticket(ticketId,ticket.getStatus(),"CLOSED");
+
         return modelMapperService.forResponse().map(saved, TicketResponse.class);
     }
 
@@ -189,12 +197,26 @@ public class TicketServiceImpl implements TicketService {
 
     private void changeticket(Long id,String firstStatus,String secondStatus){
 
+        log.info("1 changeticket");
+
+        Ticket ticket=ticketRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Ticket","Id",id));
+
+        log.info("2 changeticket");
+        Long agentId=null;
+        Agent agent=ticket.getAssignedAgent();
+        if (agent!=null){
+            agentId=agent.getId();
+        }
+
         TicketStatusHistory ticketStatusHistory=TicketStatusHistory.builder()
                 .fromStatus(firstStatus)
-                .ticket(ticketRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Ticket","Id",id)))
+                .ticket(ticket)
                 .changedAt(OffsetDateTime.now())
                 .toStatus(secondStatus)
+                .agentId(agentId)
                 .build();
+        log.info("3 changeticket");
         ticketStatusHistoryRepository.save(ticketStatusHistory);
+        log.info("4 changeticket");
     }
 }

@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
+@ToString
 @Table(name = "ticket_status_history")
 public class TicketStatusHistory {
 

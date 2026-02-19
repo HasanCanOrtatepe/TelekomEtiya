@@ -23,10 +23,8 @@ public class AgentUpdateRequest {
     private String email;
 
     @NotBlank
-    @Pattern(regexp = "^(ADMIN|AGENT)$", message = "role must be ADMIN or AGENT")
     private String role;
 
     @NotBlank
-    @Pattern(regexp = "^(ACTIVE|PASSIVE)$", message = "status must be ACTIVE or PASSIVE")
     private String status;
 }

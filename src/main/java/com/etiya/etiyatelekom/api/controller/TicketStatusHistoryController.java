@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.logging.Logger;
 
 
 @RestController
@@ -36,6 +35,12 @@ public class TicketStatusHistoryController {
     public ResponseEntity<TicketStatusHistoryListResponse> getByTicketId(@PathVariable Long id){
 
         return ResponseEntity.ok(ticketStatusHistoryService.getByTicket(id));
+    }
+
+    @GetMapping("/Agent/{id}")
+    public ResponseEntity<TicketStatusHistoryListResponse> getByAgentId(@PathVariable Long id){
+
+        return ResponseEntity.ok(ticketStatusHistoryService.getByAgent(id));
     }
 
 

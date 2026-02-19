@@ -10,5 +10,7 @@ public interface TicketStatusHistoryService {
 
     TicketStatusHistoryListResponse getByTicket(Long ticketId);
 
+    TicketStatusHistoryListResponse getByAgent(Long AgentId);
+
     TicketStatusHistoryListResponse getAll();
 }
