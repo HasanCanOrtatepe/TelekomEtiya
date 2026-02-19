@@ -14,6 +14,4 @@ public class ServiceDomainUpdateRequest {
     @Size(max = 150)
     private String name;
 
-    @NotNull
-    private Boolean isActive;
 }

@@ -27,4 +27,6 @@ public class TicketStatusHistory {
     private String toStatus;
 
     private OffsetDateTime changedAt;
+
+    private Long agentId;
 }

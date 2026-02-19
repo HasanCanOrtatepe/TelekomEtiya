@@ -14,6 +14,4 @@ public class ServiceDomainCreateRequest {
     @Size(max = 150)
     private String name;
 
-    @NotNull
-    private Boolean isActive;
 }

@@ -10,6 +10,7 @@ import lombok.*;
 @Builder
 @Entity
 @Table(name = "agent")
+@ToString
 public class Agent {
 
     @Id

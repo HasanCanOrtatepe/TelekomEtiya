@@ -13,12 +13,15 @@ import com.etiya.etiyatelekom.repository.DepartmentRepository;
 import com.etiya.etiyatelekom.repository.ServiceDomainRepository;
 import com.etiya.etiyatelekom.service.abst.AgentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -34,7 +37,13 @@ public class AgentServiceImpl implements AgentService {
     @Override
     public AgentResponse create(AgentCreateRequest request) {
 
-        Agent agent=modelMapperService.forRequest().map(request,Agent.class);
+        Agent agent=Agent.builder()
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .role(request.getRole())
+                .build();
+
+        agent.setStatus("ACTIVE");
 
         if (request.getDepartmentId()!=null){
             agent.setDepartment(departmentRepository.findById(request.getDepartmentId())
@@ -45,9 +54,16 @@ public class AgentServiceImpl implements AgentService {
             agent.setServiceDomain(serviceDomainRepository.findById(request.getServiceDomainId())
                     .orElseThrow(()-> new ResourceNotFoundException("Service Domain","Id",request.getServiceDomainId())));
         }
-        agentRepository.save(agent);
 
-        return modelMapperService.forResponse().map(agent,AgentResponse.class);
+        log.info("1 Hata burda mı?");
+        log.info(agent.toString());
+        agentRepository.save(agent);
+        log.info("2 Hata burda mı?");
+
+        AgentResponse agentResponse=modelMapperService.forResponse().map(agent,AgentResponse.class);
+
+
+        return agentResponse;
     }
 
     @Override
@@ -65,7 +81,7 @@ public class AgentServiceImpl implements AgentService {
             agent.setServiceDomain(serviceDomainRepository.findById(request.getServiceDomainId())
                     .orElseThrow(()-> new ResourceNotFoundException("Service Domain","Id",request.getServiceDomainId())));
         }
-        if (agentRepository.existsByEmail(request.getEmail())){
+        if (agentRepository.existsByEmail(request.getEmail()) && !agent.getEmail().equalsIgnoreCase(request.getEmail())){
             throw new ResourceAlreadyExistsException("Agent","Email",request.getEmail());
         }
         agent.setFullName(request.getFullName());
@@ -159,7 +175,7 @@ public class AgentServiceImpl implements AgentService {
             throw new ResourceNotFoundException();
         }
         List<Agent> agents=agentRepository.findByDepartmentId(departmentId)
-                .stream().filter(agent -> agent.getServiceDomain().equals(serviceDomainId)).toList();
+                .stream().filter(agent -> agent.getServiceDomain().getId().equals(serviceDomainId)).toList();
 
         List<AgentResponse> agentResponseList = agents.stream()
                 .map(agent -> modelMapperService.forResponse().map(agent, AgentResponse.class))
@@ -180,4 +196,14 @@ public class AgentServiceImpl implements AgentService {
         agentRepository.save(agent);
 
     }
+
+    @Override
+    public void activate(Long id) {
+        Agent agent=agentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException());
+        agent.setStatus("Active");
+        agentRepository.save(agent);
+
+    }
+
+
 }

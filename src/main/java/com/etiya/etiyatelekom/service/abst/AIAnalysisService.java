@@ -13,7 +13,5 @@ public interface AIAnalysisService {
 
     AIAnalysisListResponse getAll();
 
-    AIAnalysisResponse update(Long id, AIAnalysisUpdateRequest request);
-
     AIAnalysisResponse create(Long complaintId);
 }

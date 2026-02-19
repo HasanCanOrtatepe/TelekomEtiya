@@ -31,6 +31,7 @@ public class ServiceDomainServiceImpl implements ServiceDomainService {
             throw new ResourceAlreadyExistsException("ServiceDomain","Name", request.getName());
         }
         ServiceDomain serviceDomain=modelMapperService.forRequest().map(request,ServiceDomain.class);
+        serviceDomain.setIsActive(true);
         serviceDomainRepository.save(serviceDomain);
 
         ServiceDomainResponse serviceDomainResponse=modelMapperService.forResponse().map(serviceDomain,ServiceDomainResponse.class);
@@ -44,7 +45,6 @@ public class ServiceDomainServiceImpl implements ServiceDomainService {
                 .orElseThrow(()->new ResourceNotFoundException("Service Domain","Id",id));
 
         serviceDomain.setName(request.getName());
-        serviceDomain.setIsActive(request.getIsActive());
         serviceDomainRepository.save(serviceDomain);
 
         ServiceDomainResponse serviceDomainResponse=modelMapperService.forResponse()
@@ -66,7 +66,7 @@ public class ServiceDomainServiceImpl implements ServiceDomainService {
 
     @Override
     public ServiceDomainListResponse getAll() {
-        if (!serviceDomainRepository.findAll().isEmpty()){
+        if (serviceDomainRepository.findAll().isEmpty()){
             throw new ResourceNotFoundException();
         }
         List<ServiceDomain> serviceDomains=serviceDomainRepository.findAll();
@@ -84,7 +84,7 @@ public class ServiceDomainServiceImpl implements ServiceDomainService {
 
     @Override
     public ServiceDomainListResponse getActive() {
-        if (!serviceDomainRepository.findByIsActiveTrue().isEmpty()){
+        if (serviceDomainRepository.findByIsActiveTrue().isEmpty()){
             throw new ResourceNotFoundException();
         }
 
@@ -103,10 +103,16 @@ public class ServiceDomainServiceImpl implements ServiceDomainService {
 
     @Override
     public void deactivate(Long id) {
-        ServiceDomain serviceDomain=serviceDomainRepository.findById(id)
-                .orElseThrow(()->new ResourceNotFoundException("Service Domain","Id",id));
+        ServiceDomain serviceDomain=serviceDomainRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Service Domain","Id",id));
         serviceDomain.setIsActive(false);
         serviceDomainRepository.save(serviceDomain);
 
+    }
+
+    @Override
+    public void activate(Long id) {
+        ServiceDomain serviceDomain=serviceDomainRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Service Domain","Id",id));
+        serviceDomain.setIsActive(true);
+        serviceDomainRepository.save(serviceDomain);
     }
 }

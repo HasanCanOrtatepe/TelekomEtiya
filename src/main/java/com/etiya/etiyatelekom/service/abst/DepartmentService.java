@@ -19,4 +19,7 @@ public interface DepartmentService {
     DepartmentListResponse getActive();
 
     void deactivate(Long id);
+
+    void activate(Long id);
+
 }

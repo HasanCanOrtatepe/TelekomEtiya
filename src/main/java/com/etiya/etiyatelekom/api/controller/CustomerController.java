@@ -1,6 +1,5 @@
 package com.etiya.etiyatelekom.api.controller;
 
-
 import com.etiya.etiyatelekom.api.dto.request.customerRequest.CustomerCreateRequest;
 import com.etiya.etiyatelekom.api.dto.request.customerRequest.CustomerUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.customerResponse.CustomerResponse;
@@ -8,41 +7,40 @@ import com.etiya.etiyatelekom.api.dto.response.customerResponse.CustomerResponse
 import com.etiya.etiyatelekom.service.abst.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/customers")
 public class CustomerController {
+
     private final CustomerService customerService;
 
-    @PostMapping("customer/deneme")
-    public ResponseEntity<CustomerResponse> createCustomer(@Valid @RequestBody CustomerCreateRequest customerCreateRequest){
-        return new ResponseEntity<>(customerService.create(customerCreateRequest) , HttpStatus.CREATED);
+    @PostMapping
+    public ResponseEntity<CustomerResponse> create(@Valid @RequestBody CustomerCreateRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(request));
+    }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomerResponse> update(@PathVariable Long id,
+                                                   @Valid @RequestBody CustomerUpdateRequest request) {
+        return ResponseEntity.ok(customerService.update(id, request));
     }
-    @PutMapping("customer/deneme/{id}")
-    public ResponseEntity<CustomerResponse> updateCustomer(@Valid @RequestBody CustomerUpdateRequest customerUpdateRequest ,@PathVariable Long id){
-        return new ResponseEntity<>(customerService.update(id,customerUpdateRequest) , HttpStatus.OK);
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CustomerResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(customerService.getById(id));
     }
-    @GetMapping("customer/deneme/{id}")
-    public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable Long id){
-        return new ResponseEntity<>(customerService.getById(id) , HttpStatus.OK);
+
+    @GetMapping
+    public ResponseEntity<CustomerResponseList> getAll() {
+        return ResponseEntity.ok(customerService.getAll());
     }
-    @GetMapping("customer/deneme")
-    public ResponseEntity<CustomerResponseList> getAllCustomer(){
-        return new ResponseEntity<>(customerService.getAll(),HttpStatus.OK);
-    }
-    @DeleteMapping("customer/deneme/{id}")
-    public ResponseEntity<Void> deleteCustomerById(@PathVariable Long id){
+
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         customerService.delete(id);
-        return  ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
     }
-
-
-
-
-
 }

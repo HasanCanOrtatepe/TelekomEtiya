@@ -20,4 +20,7 @@ public class AIAnalysisResponse {
     private Float confidenceScore;
 
     private OffsetDateTime createdAt;
+
+    private Long serviceDomainId;
+    private Long departmentId;
 }

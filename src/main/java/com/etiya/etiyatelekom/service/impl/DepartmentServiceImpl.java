@@ -33,6 +33,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
 
         Department department=modelMapperService.forRequest().map(request,Department.class);
+        department.setIsActive(true);
         departmentRepository.save(department);
 
         return modelMapperService.forResponse().map(department,DepartmentResponse.class);
@@ -47,8 +48,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         department.setName(request.getName());
         department.setSlaHours(request.getSlaHours());
-        department.setIsActive(request.getIsActive());
-
         departmentRepository.save(department);
         DepartmentResponse departmentResponse=modelMapperService.forResponse().map(department,DepartmentResponse.class);
 
@@ -103,6 +102,14 @@ public class DepartmentServiceImpl implements DepartmentService {
         department.setIsActive(false);
         departmentRepository.save(department);
 
+
+    }
+
+    @Override
+    public void activate(Long id) {
+        Department department=departmentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Department","Id",id));
+        department.setIsActive(true);
+        departmentRepository.save(department);
 
     }
 }

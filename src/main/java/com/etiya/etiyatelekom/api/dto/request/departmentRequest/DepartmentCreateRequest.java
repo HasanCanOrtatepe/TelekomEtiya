@@ -19,6 +19,4 @@ public class DepartmentCreateRequest {
     @Max(720)
     private Integer slaHours;
 
-    @NotNull
-    private Boolean isActive;
 }

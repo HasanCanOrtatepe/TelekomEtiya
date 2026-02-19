@@ -19,4 +19,6 @@ public interface ServiceDomainService {
     ServiceDomainListResponse getActive();
 
     void deactivate(Long id);
+
+    void activate(Long id);
 }

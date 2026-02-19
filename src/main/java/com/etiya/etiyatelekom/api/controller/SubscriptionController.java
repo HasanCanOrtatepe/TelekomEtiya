@@ -8,51 +8,50 @@ import com.etiya.etiyatelekom.api.dto.response.subscriptionResponse.Subscription
 import com.etiya.etiyatelekom.service.abst.SubscriptionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/subscriptions")
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
 
-    @PostMapping("subscription/deneme")
-    public ResponseEntity<SubscriptionResponse> createSubscription(@Valid @RequestBody SubscriptionCreateRequest subscriptionCreateRequest){
-        return new ResponseEntity<>(subscriptionService.create(subscriptionCreateRequest),HttpStatus.CREATED);
+    @PostMapping
+    public ResponseEntity<SubscriptionResponse> create(@Valid @RequestBody SubscriptionCreateRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(subscriptionService.create(request));
     }
 
-    @PutMapping("subscription/deneme/{id}")
-    public ResponseEntity<SubscriptionResponse> updateSubscription(@Valid @RequestBody SubscriptionUpdateRequest subscriptionUpdateRequest, @PathVariable Long id){
-        return new ResponseEntity<>(subscriptionService.update(id,subscriptionUpdateRequest),HttpStatus.OK);
+    @PutMapping("/{id}")
+    public ResponseEntity<SubscriptionResponse> update(@PathVariable Long id,
+                                                       @Valid @RequestBody SubscriptionUpdateRequest request) {
+        return ResponseEntity.ok(subscriptionService.update(id, request));
     }
 
-    @PutMapping("subscription/deneme/deactive/{id}")
-    public ResponseEntity<Void> deactiveSubscription(@PathVariable Long id){
+    @GetMapping("/{id}")
+    public ResponseEntity<SubscriptionResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(subscriptionService.getById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<SubscriptionListResponse> getAll() {
+        return ResponseEntity.ok(subscriptionService.getAll());
+    }
+
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<SubscriptionListResponse> getByCustomer(@PathVariable Long customerId) {
+        return ResponseEntity.ok(subscriptionService.getByCustomer(customerId));
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<SubscriptionListResponse> getByStatus(@PathVariable String status) {
+        return ResponseEntity.ok(subscriptionService.getByStatus(status));
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<Void> deactivate(@PathVariable Long id) {
         subscriptionService.deactivate(id);
-        return  ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("subscription/deneme/status/{status}")
-    public ResponseEntity<SubscriptionListResponse> getByStatusSubscription(@PathVariable String status){
-        return  new ResponseEntity<>(subscriptionService.getByStatus(status),HttpStatus.OK);
-    }
-
-    @GetMapping("subscription/deneme/customer/{id}")
-    public ResponseEntity<SubscriptionListResponse> getByCustomerIdSubscription(@PathVariable Long id){
-        return  new ResponseEntity<>(subscriptionService.getByCustomer(id),HttpStatus.OK);
-    }
-    @GetMapping("subscription/deneme/{id}")
-    public ResponseEntity<SubscriptionResponse> getByIdSubscription(@PathVariable Long id){
-        return  new ResponseEntity<>(subscriptionService.getById(id),HttpStatus.OK);
-    }
-
-    @GetMapping("subscription/deneme")
-    public ResponseEntity<SubscriptionListResponse> getAllSubscription(){
-        return  new ResponseEntity<>(subscriptionService.getAll(),HttpStatus.OK);
-    }
-
-
-
 }

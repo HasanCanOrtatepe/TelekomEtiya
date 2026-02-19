@@ -19,6 +19,4 @@ public class DepartmentUpdateRequest {
     @Max(720)
     private Integer slaHours;
 
-    @NotNull
-    private Boolean isActive;
 }

@@ -1,9 +1,7 @@
 package com.etiya.etiyatelekom.service.impl;
 
-import com.etiya.etiyatelekom.api.dto.request.aiAnalysisRequest.AIAnalysisUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.aiAnalysisResponse.AIAnalysisListResponse;
 import com.etiya.etiyatelekom.api.dto.response.aiAnalysisResponse.AIAnalysisResponse;
-import com.etiya.etiyatelekom.common.exception.exceptions.ResourceAlreadyExistsException;
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
 import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
 import com.etiya.etiyatelekom.entity.AIAnalysis;
@@ -69,32 +67,15 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
         return aiAnalysisListResponse;
     }
 
-    @Override
-    public AIAnalysisResponse update(Long id, AIAnalysisUpdateRequest request) {
-
-        AIAnalysis aiAnalysis=aiAnalysisRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("AIAnalysis","Id",id));
-
-        aiAnalysis.setSummary(request.getSummary());
-        aiAnalysis.setPriority(request.getPriority());
-        aiAnalysis.setRiskLevel(request.getRiskLevel());
-        aiAnalysis.setConfidenceScore(request.getConfidenceScore());
-
-        aiAnalysisRepository.save(aiAnalysis);
-
-        AIAnalysisResponse aiAnalysisResponse=modelMapperService.forResponse().map(aiAnalysis,AIAnalysisResponse.class);
-
-        return aiAnalysisResponse;
-    }
 
     @Override
     public AIAnalysisResponse create(Long complaintId) {
         Complaint complaint=complaintRepository.findById(complaintId)
                 .orElseThrow(()->new ResourceNotFoundException("Complaint","Id",complaintId));
 
-        if (aiAnalysisRepository.existsByComplaintId(complaintId)){
-            throw new ResourceAlreadyExistsException("AIAnalysis","Complaint",complaintId.toString());
-        }
+        Long predictedServiceDomainId = 1L;
+        Long predictedDepartmentId = 1L;
+
 
         AIAnalysis aiAnalysis= AIAnalysis.builder()
                 .complaint(complaint)
@@ -108,7 +89,11 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
         aiAnalysisRepository.save(aiAnalysis);
 
         AIAnalysisResponse aiAnalysisResponse = modelMapperService.forResponse().map(aiAnalysis,AIAnalysisResponse.class);
+        aiAnalysisResponse.setServiceDomainId(predictedServiceDomainId);
+        aiAnalysisResponse.setDepartmentId(predictedDepartmentId);
 
         return aiAnalysisResponse;
     }
+
+
 }
