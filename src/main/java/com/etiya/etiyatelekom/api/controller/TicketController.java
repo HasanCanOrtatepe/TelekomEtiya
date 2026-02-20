@@ -5,6 +5,7 @@ import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketUpdateRoutingR
 import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketUpdateStatusRequest;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketListResponse;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketResponse;
+import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
 import com.etiya.etiyatelekom.service.abst.TicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class TicketController {
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<TicketListResponse> getByStatus(@PathVariable String status) {
+    public ResponseEntity<TicketListResponse> getByStatus(@PathVariable TicketStatusEnums status) {
         return ResponseEntity.ok(ticketService.getByStatus(status));
     }
 

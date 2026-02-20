@@ -1,5 +1,7 @@
 package com.etiya.etiyatelekom.entity;
 
+import com.etiya.etiyatelekom.common.enums.TicketPriorityEnums;
+import com.etiya.etiyatelekom.common.enums.TicketRiskLevelEnums;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,9 +27,11 @@ public class AIAnalysis {
     @Column(columnDefinition = "text")
     private String summary;
 
-    private String priority;
+    @Enumerated(EnumType.STRING)
+    private TicketPriorityEnums priority;
 
-    private String riskLevel;
+    @Enumerated(EnumType.STRING)
+    private TicketRiskLevelEnums riskLevel;
 
     private Float confidenceScore;
 

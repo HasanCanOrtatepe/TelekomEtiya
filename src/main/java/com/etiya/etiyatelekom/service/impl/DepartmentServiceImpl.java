@@ -28,6 +28,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentResponse create(DepartmentCreateRequest request) {
+
         if (departmentRepository.existsByNameIgnoreCase(request.getName())){
             throw new ResourceAlreadyExistsException("Department","Name",request.getName());
         }
@@ -65,9 +66,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentListResponse getAll() {
-        if (departmentRepository.findAll().isEmpty()){
-            throw new ResourceNotFoundException();
-        }
+
         List<Department> departments=departmentRepository.findAll();
         List<DepartmentResponse> departmentResponses= departments.stream()
                 .map(department -> modelMapperService.forResponse().map(department,DepartmentResponse.class))
@@ -81,9 +80,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentListResponse getActive() {
-        if (!departmentRepository.existsByIsActiveTrue()){
-            throw new ResourceNotFoundException();
-        }
+
         List<Department> departments= departmentRepository.findByIsActiveTrue();
         List<DepartmentResponse> departmentResponses= departments.stream()
                 .map(department -> modelMapperService.forResponse().map(department,DepartmentResponse.class))
@@ -101,7 +98,6 @@ public class DepartmentServiceImpl implements DepartmentService {
         Department department=departmentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Department","Id",id));
         department.setIsActive(false);
         departmentRepository.save(department);
-
 
     }
 

@@ -34,7 +34,7 @@ public class Customer {
     private OffsetDateTime createdAt;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-    private List<Subscription> subscriptions;
+    private List<CustomerSubscription> customerSubscriptions;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     private List<Complaint> complaints;

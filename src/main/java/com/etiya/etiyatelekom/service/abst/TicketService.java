@@ -6,6 +6,7 @@ import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketUpdateRoutingR
 import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketUpdateStatusRequest;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketListResponse;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketResponse;
+import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
 
 public interface TicketService {
 
@@ -13,7 +14,7 @@ public interface TicketService {
 
     TicketListResponse getAll();
 
-    TicketListResponse getByStatus(String status);
+    TicketListResponse getByStatus(TicketStatusEnums request);
 
     TicketListResponse getByDepartment(Long departmentId);
 

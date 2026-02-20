@@ -12,13 +12,20 @@ import java.time.LocalDate;
 @Builder
 public class SubscriptionUpdateRequest {
 
-    @NotBlank
-    @Size(max = 80)
-    private String serviceType;
+    @NotNull()
+    @Positive()
+    private Long serviceDomainId;
 
     @NotBlank
     @Size(max = 120)
     private String packageName;
+
+    @NotNull
+    private Double price;
+
+    @NotNull()
+    @Positive()
+    private Integer durationDays;
 
 
 }

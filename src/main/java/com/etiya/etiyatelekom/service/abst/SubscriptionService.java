@@ -17,10 +17,6 @@ public interface SubscriptionService {
 
     SubscriptionListResponse getAll();
 
-    SubscriptionListResponse getByCustomer(Long customerId);
-
-    SubscriptionListResponse getByStatus(String status);
-
-    void deactivate(Long id);
+    void delete(Long id);
 
 }

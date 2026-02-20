@@ -4,20 +4,10 @@ package com.etiya.etiyatelekom.service.abst;
 import com.etiya.etiyatelekom.api.dto.request.emailNotificationRequest.EmailNotificationCreateRequest;
 import com.etiya.etiyatelekom.api.dto.response.emailNotificationResponse.EmailNotificationListResponse;
 import com.etiya.etiyatelekom.api.dto.response.emailNotificationResponse.EmailNotificationResponse;
+import com.etiya.etiyatelekom.entity.Ticket;
 
 public interface EmailNotificationService {
 
-    EmailNotificationResponse create(EmailNotificationCreateRequest request);
+    void sendMail(Ticket ticket);
 
-    EmailNotificationResponse getById(Long id);
-
-    EmailNotificationListResponse getAll();
-
-    EmailNotificationListResponse getByTicket(Long ticketId);
-
-    EmailNotificationListResponse getByStatus(String status);
-
-    EmailNotificationResponse markAsSent(Long id); // sentAt = now
-
-    EmailNotificationResponse markAsFailed(Long id);
 }

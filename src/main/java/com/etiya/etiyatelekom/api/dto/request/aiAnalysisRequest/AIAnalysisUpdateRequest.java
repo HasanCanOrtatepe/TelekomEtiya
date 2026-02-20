@@ -1,5 +1,7 @@
 package com.etiya.etiyatelekom.api.dto.request.aiAnalysisRequest;
 
+import com.etiya.etiyatelekom.common.enums.TicketPriorityEnums;
+import com.etiya.etiyatelekom.common.enums.TicketRiskLevelEnums;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -14,11 +16,11 @@ public class AIAnalysisUpdateRequest {
     @Size(max = 5000)
     private String summary;
 
-    @NotBlank
-    private String priority;
+    @NotNull
+    private TicketPriorityEnums priority;
 
-    @NotBlank
-    private String riskLevel;
+    @NotNull
+    private TicketRiskLevelEnums riskLevel;
 
     @NotNull
     @DecimalMin(value = "0.0", inclusive = true)

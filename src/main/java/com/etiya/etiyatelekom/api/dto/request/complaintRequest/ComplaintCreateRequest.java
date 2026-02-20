@@ -13,8 +13,6 @@ public class ComplaintCreateRequest {
     @NotNull
     private Long customerId;
 
-    private Long subscriptionId;
-
     @NotBlank
     @Size(max = 200)
     private String title;

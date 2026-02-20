@@ -1,5 +1,6 @@
 package com.etiya.etiyatelekom.entity;
 
+import com.etiya.etiyatelekom.common.enums.AgentRoleEnums;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,7 +30,7 @@ public class Agent {
 
     private String email;
 
-    private String role;
+    private AgentRoleEnums role;
 
-    private String status;
+    private Boolean isActive;
 }

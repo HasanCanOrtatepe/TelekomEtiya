@@ -19,18 +19,19 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
+    private List<CustomerSubscription> customerSubscriptions;
 
-    private String serviceType;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "service_domain_id")
+    private ServiceDomain serviceDomain;
 
     private String packageName;
 
-    private String status;
+    private LocalDate createDate;
 
-    private LocalDate activationDate;
+    private Integer durationDays;
 
-    @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
-    private List<Complaint> complaints;
+    private Double price;
+
 }

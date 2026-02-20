@@ -1,5 +1,8 @@
 package com.etiya.etiyatelekom.api.dto.response.ticketResponse;
 
+import com.etiya.etiyatelekom.common.enums.TicketPriorityEnums;
+import com.etiya.etiyatelekom.common.enums.TicketRiskLevelEnums;
+import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
 import lombok.*;
 
 import java.time.OffsetDateTime;
@@ -18,9 +21,10 @@ public class TicketResponse {
     private Long departmentId;
     private Long assignedAgentId;
 
-    private String status;
-    private String priority;
-    private String riskLevel;
+    private TicketStatusEnums status;
+    private TicketPriorityEnums priority;
+
+    private TicketRiskLevelEnums riskLevel;
 
     private OffsetDateTime slaDueAt;
     private OffsetDateTime createdAt;

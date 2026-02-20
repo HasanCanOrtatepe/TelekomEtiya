@@ -7,8 +7,10 @@ import com.etiya.etiyatelekom.api.dto.response.subscriptionResponse.Subscription
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
 import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
 import com.etiya.etiyatelekom.entity.Customer;
+import com.etiya.etiyatelekom.entity.ServiceDomain;
 import com.etiya.etiyatelekom.entity.Subscription;
 import com.etiya.etiyatelekom.repository.CustomerRepository;
+import com.etiya.etiyatelekom.repository.ServiceDomainRepository;
 import com.etiya.etiyatelekom.repository.SubscriptionRepository;
 import com.etiya.etiyatelekom.service.abst.SubscriptionService;
 import lombok.RequiredArgsConstructor;
@@ -25,22 +27,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final ModelMapperService modelMapperService;
     private final SubscriptionRepository subscriptionRepository;
-    private final CustomerRepository customerRepository;
+    private final ServiceDomainRepository serviceDomainRepository;
 
 
     @Override
     public SubscriptionResponse create(SubscriptionCreateRequest request) {
-
-        Customer customer = customerRepository.findById(request.getCustomerId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Customer", "id", request.getCustomerId()));
+        ServiceDomain serviceDomain=serviceDomainRepository.findById(request.getServiceDomainId())
+                .orElseThrow(()->new ResourceNotFoundException("Service Domain","Id",request.getServiceDomainId()));
 
         Subscription subscription = Subscription.builder()
-                .customer(customer)
-                .serviceType(request.getServiceType())
+                .serviceDomain(serviceDomain)
                 .packageName(request.getPackageName())
-                .status("ACTIVE")
-                .activationDate(LocalDate.now())
+                .createDate(LocalDate.now())
+                .price(request.getPrice())
+                .durationDays(request.getDurationDays())
                 .build();
 
         Subscription saved = subscriptionRepository.save(subscription);
@@ -51,10 +51,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public SubscriptionResponse update(Long id, SubscriptionUpdateRequest request) {
-        Subscription subscription=subscriptionRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Subscription","Id",id));
+        ServiceDomain serviceDomain=serviceDomainRepository.findById(request.getServiceDomainId())
+                .orElseThrow(()->new ResourceNotFoundException("Service Domain","Id",request.getServiceDomainId()));
+
+
+        Subscription subscription=subscriptionRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Subscription","Id",id));
 
         subscription.setPackageName(request.getPackageName());
-        subscription.setServiceType(request.getServiceType());
+        subscription.setServiceDomain(serviceDomain);
+        subscription.setPrice(request.getPrice());
+        subscription.setDurationDays(request.getDurationDays());
+
         subscriptionRepository.save(subscription);
         SubscriptionResponse response= modelMapperService.forResponse().map(subscription,SubscriptionResponse.class);
 
@@ -70,9 +78,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public SubscriptionListResponse getAll() {
-        if (subscriptionRepository.findAll().isEmpty()){
-            throw new ResourceNotFoundException();
-        }
+
         List<Subscription> subscriptions=subscriptionRepository.findAll();
         List<SubscriptionResponse> subscriptionResponses=subscriptions.stream()
                 .map(subscription -> modelMapperService.forResponse().map(subscription,SubscriptionResponse.class))
@@ -85,43 +91,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public SubscriptionListResponse getByCustomer(Long customerId) {
-        if (!subscriptionRepository.existsByCustomerId(customerId)){
-            throw new ResourceNotFoundException("Customer","Id",customerId);
-        }
-        List<Subscription> subscriptions= subscriptionRepository.findByCustomer_Id(customerId);
-        List<SubscriptionResponse> subscriptionResponses=subscriptions.stream()
-                .map(subscription -> modelMapperService.forResponse().map(subscription,SubscriptionResponse.class))
-                .toList();
-        SubscriptionListResponse subscriptionListResponse= new SubscriptionListResponse();
-        subscriptionListResponse.setCount(subscriptionResponses.size());
-        subscriptionListResponse.setItems(subscriptionResponses);
-
-        return subscriptionListResponse;
-    }
-
-    @Override
-    public SubscriptionListResponse getByStatus(String status) {
-
-        if (!subscriptionRepository.existsByStatus(status)){
-            throw new ResourceNotFoundException("Subscription","Status",status);
-        }
-        List<Subscription> subscriptions= subscriptionRepository.findByStatus(status);
-        List<SubscriptionResponse> subscriptionResponses=subscriptions.stream()
-                .map(subscription -> modelMapperService.forResponse().map(subscription,SubscriptionResponse.class))
-                .toList();
-        SubscriptionListResponse subscriptionListResponse= new SubscriptionListResponse();
-        subscriptionListResponse.setCount(subscriptionResponses.size());
-        subscriptionListResponse.setItems(subscriptionResponses);
-
-        return subscriptionListResponse;
-
-    }
-
-    @Override
-    public void deactivate(Long id) {
+    public void delete(Long id) {
         Subscription subscription=subscriptionRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Subscription","Id",id));
-        subscription.setStatus("Deactive");
-        subscriptionRepository.save(subscription);
+        subscriptionRepository.delete(subscription);
     }
 }

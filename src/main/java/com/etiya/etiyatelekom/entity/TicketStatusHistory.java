@@ -1,5 +1,6 @@
 package com.etiya.etiyatelekom.entity;
 
+import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,11 +24,14 @@ public class TicketStatusHistory {
     @JoinColumn(name = "ticket_id")
     private Ticket ticket;
 
-    private String fromStatus;
+    private TicketStatusEnums fromStatus;
 
-    private String toStatus;
+    private TicketStatusEnums toStatus;
 
     private OffsetDateTime changedAt;
 
     private Long agentId;
+
+    @Enumerated(EnumType.STRING)
+    private TicketStatusEnums status;
 }

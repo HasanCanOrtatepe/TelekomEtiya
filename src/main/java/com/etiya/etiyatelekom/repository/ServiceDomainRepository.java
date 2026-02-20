@@ -10,5 +10,6 @@ public interface ServiceDomainRepository extends JpaRepository<ServiceDomain,Lon
 
     boolean existsByNameIgnoreCase(String name);
     List<ServiceDomain> findByIsActiveTrue();
+    boolean existsByIdIsNotNull();
 
 }

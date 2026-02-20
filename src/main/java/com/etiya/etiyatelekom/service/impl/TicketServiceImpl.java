@@ -5,6 +5,7 @@ import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketUpdateRoutingR
 import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketUpdateStatusRequest;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketListResponse;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketResponse;
+import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
 import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
 import com.etiya.etiyatelekom.entity.*;
@@ -42,9 +43,6 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketListResponse getAll() {
         List<Ticket> tickets = ticketRepository.findAll();
-        if (tickets.isEmpty()) {
-            throw new ResourceNotFoundException("Ticket", "list", "empty");
-        }
 
         List<TicketResponse> items = tickets.stream()
                 .map(t -> modelMapperService.forResponse().map(t, TicketResponse.class))
@@ -57,11 +55,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketListResponse getByStatus(String status) {
-
-        if (!ticketRepository.existsByStatus(status)) {
-            throw new ResourceNotFoundException("Ticket", "status", status);
-        }
+    public TicketListResponse getByStatus(TicketStatusEnums status) {
 
         List<TicketResponse> items = ticketRepository.findByStatus(status).stream()
                 .map(t -> modelMapperService.forResponse().map(t, TicketResponse.class))
@@ -76,10 +70,6 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketListResponse getByDepartment(Long departmentId) {
 
-        if (!ticketRepository.existsByDepartment_Id(departmentId)) {
-            throw new ResourceNotFoundException("Ticket", "departmentId", departmentId);
-        }
-
         List<TicketResponse> items = ticketRepository.findByDepartment_Id(departmentId).stream()
                 .map(t -> modelMapperService.forResponse().map(t, TicketResponse.class))
                 .toList();
@@ -92,10 +82,6 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketListResponse getByAgent(Long agentId) {
-
-        if (!ticketRepository.existsByAssignedAgent_Id(agentId)) {
-            throw new ResourceNotFoundException("Ticket", "agentId", agentId);
-        }
 
         List<TicketResponse> items = ticketRepository.findByAssignedAgent_Id(agentId).stream()
                 .map(t -> modelMapperService.forResponse().map(t, TicketResponse.class))
@@ -117,14 +103,17 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Agent", "id", request.getAgentId()));
 
         ticket.setAssignedAgent(agent);
+        changeticket(ticketId,ticket.getStatus(),TicketStatusEnums.ASSIGNED);
+
+        ticket.setStatus(TicketStatusEnums.ASSIGNED);
 
         Ticket saved = ticketRepository.save(ticket);
+
         return modelMapperService.forResponse().map(saved, TicketResponse.class);
     }
 
     @Override
     public TicketResponse updateStatus(Long ticketId, TicketUpdateStatusRequest request) {
-
 
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", "id", ticketId));
@@ -166,11 +155,11 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", "id", ticketId));
 
 
-        ticket.setStatus("CLOSED");
+        ticket.setStatus(TicketStatusEnums.CLOSED);
         ticket.setClosedAt(OffsetDateTime.now());
 
         Ticket saved = ticketRepository.save(ticket);
-        changeticket(ticketId,ticket.getStatus(),"CLOSED");
+        changeticket(ticketId,ticket.getStatus(),TicketStatusEnums.CLOSED);
 
         return modelMapperService.forResponse().map(saved, TicketResponse.class);
     }
@@ -180,10 +169,7 @@ public class TicketServiceImpl implements TicketService {
 
         OffsetDateTime now = OffsetDateTime.now();
 
-        List<Ticket> tickets = ticketRepository.findBySlaDueAtBeforeAndStatusNot(now, "CLOSED");
-        if (tickets.isEmpty()) {
-            throw new ResourceNotFoundException("Ticket", "slaBreached", "none");
-        }
+        List<Ticket> tickets = ticketRepository.findBySlaDueAtBeforeAndStatusNot(now, TicketStatusEnums.CLOSED);
 
         List<TicketResponse> items = tickets.stream()
                 .map(t -> modelMapperService.forResponse().map(t, TicketResponse.class))
@@ -195,7 +181,7 @@ public class TicketServiceImpl implements TicketService {
                 .build();
     }
 
-    private void changeticket(Long id,String firstStatus,String secondStatus){
+    private void changeticket(Long id,TicketStatusEnums firstStatus,TicketStatusEnums secondStatus){
 
         log.info("1 changeticket");
 

@@ -12,11 +12,12 @@ import java.time.LocalDate;
 public class SubscriptionResponse {
 
     private Long id;
-    private Long customerId;
 
     private String serviceType;
     private String packageName;
-    private String status;
+
+    private Integer durationDays;
 
     private LocalDate activationDate;
+
 }

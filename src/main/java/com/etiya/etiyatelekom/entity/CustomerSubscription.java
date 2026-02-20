@@ -1,5 +1,6 @@
 package com.etiya.etiyatelekom.entity;
 
+import com.etiya.etiyatelekom.common.enums.SubscriptionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,8 +12,8 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "complaint")
-public class Complaint {
+@Table(name = "customer_subscription")
+public class CustomerSubscription {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,15 +23,15 @@ public class Complaint {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    private String title;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "subscription_id")
+    private Subscription subscription;
 
-    private String description;
 
-    private OffsetDateTime createdAt;
+    private OffsetDateTime startDate;
 
-    @OneToOne(mappedBy = "complaint", cascade = CascadeType.ALL)
-    private AIAnalysis aiAnalysis;
+    private OffsetDateTime endDate;
 
-    @OneToOne(mappedBy = "complaint", cascade = CascadeType.ALL)
-    private Ticket ticket;
+    private SubscriptionStatus status;
+
 }

@@ -8,13 +8,4 @@ import java.util.List;
 
 public interface SubscriptionRepository extends JpaRepository<Subscription,Long> {
 
-    List<Subscription> findByCustomer_Id(Long customerId);
-
-    List<Subscription> findByStatus(String status);
-
-    boolean existsByStatus(String email);
-    boolean existsByCustomerId(Long customerId);
-
-
-
 }

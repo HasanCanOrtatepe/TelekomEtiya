@@ -43,7 +43,7 @@ public class AgentServiceImpl implements AgentService {
                 .role(request.getRole())
                 .build();
 
-        agent.setStatus("ACTIVE");
+        agent.setIsActive(true);
 
         if (request.getDepartmentId()!=null){
             agent.setDepartment(departmentRepository.findById(request.getDepartmentId())
@@ -87,7 +87,7 @@ public class AgentServiceImpl implements AgentService {
         agent.setFullName(request.getFullName());
         agent.setEmail(request.getEmail());
         agent.setRole(request.getRole());
-        agent.setStatus(request.getStatus());
+        agent.setIsActive(request.getIsActive());
         agentRepository.save(agent);
 
         return modelMapperService.forResponse().map(agent,AgentResponse.class);
@@ -101,9 +101,7 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public AgentListResponse getAll() {
-        if (agentRepository.findAll().isEmpty()){
-            throw new ResourceNotFoundException();
-        }
+
         List<Agent> agents=agentRepository.findAll();
         List<AgentResponse> agentResponseList=agents.stream()
                 .map(agent -> modelMapperService.forResponse().map(agent,AgentResponse.class))
@@ -118,9 +116,7 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public AgentListResponse searchByName(String name) {
-        if (!agentRepository.existsByFullName(name)){
-            throw new ResourceNotFoundException();
-        }
+
         List<Agent> agents=agentRepository.findByFullNameContainingIgnoreCase(name);
 
         List<AgentResponse> agentResponseList=agents.stream()
@@ -136,9 +132,7 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public AgentListResponse getByDepartment(Long departmentId) {
-        if (!agentRepository.existsByDepartmentId(departmentId)){
-            throw new ResourceNotFoundException();
-        }
+
         List<Agent> agents=agentRepository.findByDepartmentId(departmentId);
 
         List<AgentResponse> agentResponseList=agents.stream()
@@ -154,9 +148,7 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public AgentListResponse getByServiceDomain(Long serviceDomainId) {
-        if (!agentRepository.existsByServiceDomainId(serviceDomainId)) {
-            throw new ResourceNotFoundException();
-        }
+
         List<Agent> agents = agentRepository.findByServiceDomainId(serviceDomainId);
 
         List<AgentResponse> agentResponseList = agents.stream()
@@ -169,11 +161,10 @@ public class AgentServiceImpl implements AgentService {
                 .build();
         return agentListResponse;
     }
+
     @Override
     public AgentListResponse getAvailableAgents(Long departmentId, Long serviceDomainId) {
-        if (!agentRepository.existsByDepartmentId(departmentId)&&!agentRepository.existsByServiceDomainId(serviceDomainId)){
-            throw new ResourceNotFoundException();
-        }
+
         List<Agent> agents=agentRepository.findByDepartmentId(departmentId)
                 .stream().filter(agent -> agent.getServiceDomain().getId().equals(serviceDomainId)).toList();
 
@@ -192,7 +183,7 @@ public class AgentServiceImpl implements AgentService {
     public void deactivate(Long id) {
         Agent agent=agentRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException());
-        agent.setStatus("Deactive");
+        agent.setIsActive(false);
         agentRepository.save(agent);
 
     }
@@ -200,7 +191,7 @@ public class AgentServiceImpl implements AgentService {
     @Override
     public void activate(Long id) {
         Agent agent=agentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException());
-        agent.setStatus("Active");
+        agent.setIsActive(true);
         agentRepository.save(agent);
 
     }

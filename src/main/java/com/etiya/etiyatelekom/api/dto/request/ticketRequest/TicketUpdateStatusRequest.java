@@ -1,5 +1,6 @@
 package com.etiya.etiyatelekom.api.dto.request.ticketRequest;
 
+import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -10,6 +11,6 @@ import lombok.*;
 @Builder
 public class TicketUpdateStatusRequest {
 
-    @NotBlank
-    private String status;
+    @NotNull
+    private TicketStatusEnums status;
 }

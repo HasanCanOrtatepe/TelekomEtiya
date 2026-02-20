@@ -39,19 +39,9 @@ public class SubscriptionController {
         return ResponseEntity.ok(subscriptionService.getAll());
     }
 
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<SubscriptionListResponse> getByCustomer(@PathVariable Long customerId) {
-        return ResponseEntity.ok(subscriptionService.getByCustomer(customerId));
-    }
-
-    @GetMapping("/status/{status}")
-    public ResponseEntity<SubscriptionListResponse> getByStatus(@PathVariable String status) {
-        return ResponseEntity.ok(subscriptionService.getByStatus(status));
-    }
-
-    @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivate(@PathVariable Long id) {
-        subscriptionService.deactivate(id);
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        subscriptionService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

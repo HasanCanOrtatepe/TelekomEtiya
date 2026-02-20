@@ -1,5 +1,8 @@
 package com.etiya.etiyatelekom.entity;
 
+import com.etiya.etiyatelekom.common.enums.TicketPriorityEnums;
+import com.etiya.etiyatelekom.common.enums.TicketRiskLevelEnums;
+import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,11 +38,14 @@ public class Ticket {
     @JoinColumn(name = "assigned_agent_id")
     private Agent assignedAgent;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private TicketStatusEnums status;
 
-    private String priority;
+    @Enumerated(EnumType.STRING)
+    private TicketPriorityEnums priority;
 
-    private String riskLevel;
+    @Enumerated(EnumType.STRING)
+    private TicketRiskLevelEnums riskLevel;
 
     private OffsetDateTime slaDueAt;
 

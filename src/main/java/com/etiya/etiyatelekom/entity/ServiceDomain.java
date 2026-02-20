@@ -3,6 +3,8 @@ package com.etiya.etiyatelekom.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,6 +19,9 @@ public class ServiceDomain {
     private Long id;
 
     private String name;
+
+    @OneToMany(mappedBy = "serviceDomain")
+    private List<Subscription> subscriptions;
 
     private Boolean isActive;
 }

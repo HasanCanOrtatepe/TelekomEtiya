@@ -66,9 +66,6 @@ public class ServiceDomainServiceImpl implements ServiceDomainService {
 
     @Override
     public ServiceDomainListResponse getAll() {
-        if (serviceDomainRepository.findAll().isEmpty()){
-            throw new ResourceNotFoundException();
-        }
         List<ServiceDomain> serviceDomains=serviceDomainRepository.findAll();
         List<ServiceDomainResponse> serviceDomainResponses= serviceDomains.stream()
                 .map(serviceDomain -> modelMapperService.forResponse().map(serviceDomain,ServiceDomainResponse.class))
@@ -84,9 +81,6 @@ public class ServiceDomainServiceImpl implements ServiceDomainService {
 
     @Override
     public ServiceDomainListResponse getActive() {
-        if (serviceDomainRepository.findByIsActiveTrue().isEmpty()){
-            throw new ResourceNotFoundException();
-        }
 
         List<ServiceDomain> serviceDomains=serviceDomainRepository.findByIsActiveTrue();
         List<ServiceDomainResponse> serviceDomainResponses= serviceDomains.stream()

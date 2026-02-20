@@ -14,7 +14,6 @@ public class ComplaintResponse {
     private Long id;
 
     private Long customerId;
-    private Long subscriptionId;
 
     private String title;
     private String description;

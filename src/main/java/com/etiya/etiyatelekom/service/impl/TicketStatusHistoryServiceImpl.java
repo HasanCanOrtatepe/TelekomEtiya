@@ -36,9 +36,6 @@ public class TicketStatusHistoryServiceImpl implements TicketStatusHistoryServic
     @Override
     public TicketStatusHistoryListResponse getByTicket(Long ticketId) {
 
-        if (ticketStatusHistoryRepository.findByTicketId(ticketId).isEmpty()){
-            throw new ResourceNotFoundException();
-        }
         List<TicketStatusHistory> ticketStatusHistories=ticketStatusHistoryRepository.findByTicketId(ticketId);
         List<TicketStatusHistoryResponse> ticketStatusHistoryResponses=ticketStatusHistories.stream()
                 .map(ticketStatusHistory -> TicketStatusHistoryResponse.builder()
@@ -62,9 +59,6 @@ public class TicketStatusHistoryServiceImpl implements TicketStatusHistoryServic
     @Override
     public TicketStatusHistoryListResponse getByAgent(Long AgentId) {
 
-        if (ticketStatusHistoryRepository.findByAgentId(AgentId).isEmpty()){
-            throw new ResourceNotFoundException();
-        }
         List<TicketStatusHistory> ticketStatusHistories=ticketStatusHistoryRepository.findByAgentId(AgentId);
         List<TicketStatusHistoryResponse> ticketStatusHistoryResponses=ticketStatusHistories.stream()
                 .map(ticketStatusHistory -> TicketStatusHistoryResponse.builder()
@@ -87,9 +81,7 @@ public class TicketStatusHistoryServiceImpl implements TicketStatusHistoryServic
 
     @Override
     public TicketStatusHistoryListResponse getAll() {
-        if (ticketStatusHistoryRepository.findAll().isEmpty()){
-            throw new ResourceNotFoundException();
-        }
+
         List<TicketStatusHistory> ticketStatusHistories=ticketStatusHistoryRepository.findAll();
         ticketStatusHistories.forEach(ticketStatusHistory -> log.info(ticketStatusHistories.toString()));
         List<TicketStatusHistoryResponse> ticketStatusHistoryResponses=ticketStatusHistories.stream()

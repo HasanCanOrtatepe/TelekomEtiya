@@ -1,5 +1,6 @@
 package com.etiya.etiyatelekom.api.dto.response.agentResponse;
 
+import com.etiya.etiyatelekom.common.enums.AgentRoleEnums;
 import lombok.*;
 
 @Getter
@@ -15,6 +16,7 @@ public class AgentResponse {
 
     private String fullName;
     private String email;
-    private String role;
-    private String status;
+    private AgentRoleEnums role;
+    private Boolean isActive;
+
 }

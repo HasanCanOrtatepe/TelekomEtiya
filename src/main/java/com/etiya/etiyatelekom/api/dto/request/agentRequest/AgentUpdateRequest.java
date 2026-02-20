@@ -1,5 +1,6 @@
 package com.etiya.etiyatelekom.api.dto.request.agentRequest;
 
+import com.etiya.etiyatelekom.common.enums.AgentRoleEnums;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -22,9 +23,10 @@ public class AgentUpdateRequest {
     @Size(max = 150)
     private String email;
 
-    @NotBlank
-    private String role;
+    @NotNull
+    private AgentRoleEnums role;
 
-    @NotBlank
-    private String status;
+    @NotNull
+    private Boolean isActive;
+
 }

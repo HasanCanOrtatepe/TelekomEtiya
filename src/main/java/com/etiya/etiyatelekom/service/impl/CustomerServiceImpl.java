@@ -59,6 +59,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         return modelMapperService.forResponse().map(saved, CustomerResponse.class);
     }
+
     @Override
     public CustomerResponse getById(Long id) {
         Customer customer = customerRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Customer","id",id));
@@ -67,9 +68,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponseList getAll() {
-        if (customerRepository.findAll().isEmpty()){
-            throw new ResourceNotFoundException();
-        }
+
         List<Customer> customers =customerRepository.findAll();
         List<CustomerResponse> customerResponses= customers.stream().map(c-> modelMapperService.forResponse().map(c,CustomerResponse.class)).toList();
         return CustomerResponseList.builder()
