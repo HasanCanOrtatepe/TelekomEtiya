@@ -10,5 +10,4 @@ public interface ComplaintRepository extends JpaRepository<Complaint,Long> {
 
     List<Complaint> findByCustomerId(Long customerId);
     boolean existsById(Long id);
-
 }

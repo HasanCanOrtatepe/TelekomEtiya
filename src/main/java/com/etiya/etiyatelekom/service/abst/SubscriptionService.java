@@ -6,6 +6,7 @@ import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketAssignRequest;
 import com.etiya.etiyatelekom.api.dto.response.subscriptionResponse.SubscriptionListResponse;
 import com.etiya.etiyatelekom.api.dto.response.subscriptionResponse.SubscriptionResponse;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketResponse;
+import com.etiya.etiyatelekom.entity.Subscription;
 
 public interface SubscriptionService {
 
@@ -18,5 +19,7 @@ public interface SubscriptionService {
     SubscriptionListResponse getAll();
 
     void delete(Long id);
+
+    Subscription getEntityById(Long id);
 
 }

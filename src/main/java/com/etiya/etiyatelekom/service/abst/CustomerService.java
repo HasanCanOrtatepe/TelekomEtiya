@@ -4,6 +4,7 @@ import com.etiya.etiyatelekom.api.dto.request.customerRequest.CustomerCreateRequ
 import com.etiya.etiyatelekom.api.dto.request.customerRequest.CustomerUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.customerResponse.CustomerResponse;
 import com.etiya.etiyatelekom.api.dto.response.customerResponse.CustomerResponseList;
+import com.etiya.etiyatelekom.entity.Customer;
 
 public interface CustomerService {
 
@@ -18,4 +19,6 @@ public interface CustomerService {
     CustomerResponseList search(String query);
 
     void delete(Long id);
+
+    Customer getEntityById(Long id);
 }

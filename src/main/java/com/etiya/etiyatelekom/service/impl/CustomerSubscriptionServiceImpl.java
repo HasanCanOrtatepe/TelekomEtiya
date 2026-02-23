@@ -14,7 +14,9 @@ import com.etiya.etiyatelekom.entity.Subscription;
 import com.etiya.etiyatelekom.repository.CustomerRepository;
 import com.etiya.etiyatelekom.repository.CustomerSubscriptionRepository;
 import com.etiya.etiyatelekom.repository.SubscriptionRepository;
+import com.etiya.etiyatelekom.service.abst.CustomerService;
 import com.etiya.etiyatelekom.service.abst.CustomerSubscriptionService;
+import com.etiya.etiyatelekom.service.abst.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,17 +30,18 @@ import java.util.List;
 @Transactional
 public class CustomerSubscriptionServiceImpl implements CustomerSubscriptionService {
 
-    private final CustomerRepository customerRepository;
+    private final CustomerService customerService;
     private final CustomerSubscriptionRepository customerSubscriptionRepository;
-    private final SubscriptionRepository subscriptionRepository;
+    private final SubscriptionService subscriptionService;
 
 
     @Override
     public CustomerSubscriptionResponse purchase(CustomerSubscriptionPurchaseRequest request) {
-        Customer customer = customerRepository.findById(request.getCustomerId()).orElseThrow(
-                ()->new ResourceNotFoundException("Customer","Id",request.getCustomerId()));
-        Subscription subscription= subscriptionRepository.findById(request.getSubscriptionId()).orElseThrow(
-                ()-> new ResourceNotFoundException("Subscription","Id",request.getSubscriptionId()));
+
+        Customer customer = customerService.getEntityById(request.getCustomerId());
+
+        Subscription subscription = subscriptionService.getEntityById(request.getSubscriptionId());
+
         if (customerSubscriptionRepository.existsByCustomerIdAndSubscriptionId(request.getCustomerId(),request.getSubscriptionId())){
             throw new ResourceAlreadyExistsException("Customer Subscription","Customer","Subscription");
         }

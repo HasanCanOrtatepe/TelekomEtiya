@@ -4,6 +4,8 @@ package com.etiya.etiyatelekom.service.abst;
 import com.etiya.etiyatelekom.api.dto.request.aiAnalysisRequest.AIAnalysisUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.aiAnalysisResponse.AIAnalysisListResponse;
 import com.etiya.etiyatelekom.api.dto.response.aiAnalysisResponse.AIAnalysisResponse;
+import com.etiya.etiyatelekom.entity.AIAnalysis;
+import com.etiya.etiyatelekom.entity.Complaint;
 
 public interface AIAnalysisService {
 
@@ -13,5 +15,8 @@ public interface AIAnalysisService {
 
     AIAnalysisListResponse getAll();
 
-    AIAnalysisResponse create(Long complaintId);
+    AIAnalysisResponse create(Complaint complaint);
+
+    AIAnalysis getEntityById(Long id);
+
 }

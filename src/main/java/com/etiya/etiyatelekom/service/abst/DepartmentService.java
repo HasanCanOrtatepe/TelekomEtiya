@@ -5,6 +5,7 @@ import com.etiya.etiyatelekom.api.dto.request.departmentRequest.DepartmentCreate
 import com.etiya.etiyatelekom.api.dto.request.departmentRequest.DepartmentUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.departmentResponse.DepartmentListResponse;
 import com.etiya.etiyatelekom.api.dto.response.departmentResponse.DepartmentResponse;
+import com.etiya.etiyatelekom.entity.Department;
 
 public interface DepartmentService {
 
@@ -21,5 +22,7 @@ public interface DepartmentService {
     void deactivate(Long id);
 
     void activate(Long id);
+
+    Department getActiveEntityById(Long id);
 
 }

@@ -8,12 +8,12 @@ import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundExcept
 import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
 import com.etiya.etiyatelekom.entity.AIAnalysis;
 import com.etiya.etiyatelekom.entity.Complaint;
-import com.etiya.etiyatelekom.entity.ServiceDomain;
 import com.etiya.etiyatelekom.repository.AIAnalysisRepository;
-import com.etiya.etiyatelekom.repository.ComplaintRepository;
 import com.etiya.etiyatelekom.repository.DepartmentRepository;
 import com.etiya.etiyatelekom.repository.ServiceDomainRepository;
 import com.etiya.etiyatelekom.service.abst.AIAnalysisService;
+import com.etiya.etiyatelekom.service.abst.DepartmentService;
+import com.etiya.etiyatelekom.service.abst.ServiceDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,9 +30,8 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
 
     private final AIAnalysisRepository aiAnalysisRepository;
     private final ModelMapperService modelMapperService;
-    private final ComplaintRepository complaintRepository;
-    private final ServiceDomainRepository serviceDomainRepository;
-    private final DepartmentRepository departmentRepository;
+    private final ServiceDomainService serviceDomainService;
+    private final DepartmentService departmentService ;
 
     @Override
     public AIAnalysisResponse getById(Long id) {
@@ -76,22 +75,20 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
 
 
     @Override
-    public AIAnalysisResponse create(Long complaintId) {
+    public AIAnalysisResponse create(Complaint complaint) {
 
-        Complaint complaint=complaintRepository.findById(complaintId)
-                .orElseThrow(()->new ResourceNotFoundException("Complaint","Id",complaintId));
-
-        if (!departmentRepository.existsByIdIsNotNull()){
-            throw new ResourceNotFoundException("Department","System","System not ready wait please");
+        if (departmentService.getActive().getCount() == 0) {
+            throw new ResourceNotFoundException(
+                    "Department","System","System not ready wait please");
         }
-        if (!serviceDomainRepository.existsByIdIsNotNull()){
-            throw new ResourceNotFoundException("Department","System","System not ready wait please");
+
+        if (serviceDomainService.getActive().getCount() == 0) {
+            throw new ResourceNotFoundException(
+                    "ServiceDomain","System","System not ready wait please");
         }
 
         Long predictedServiceDomainId = 1L;
         Long predictedDepartmentId = 1L;
-
-
 
         AIAnalysis aiAnalysis= AIAnalysis.builder()
                 .complaint(complaint)
@@ -101,14 +98,28 @@ public class AIAnalysisServiceImpl implements AIAnalysisService {
                 .priority(TicketPriorityEnums.MEDIUM)
                 .summary("Deneme Yapıyorum")
                 .build();
-
         aiAnalysisRepository.save(aiAnalysis);
 
-        AIAnalysisResponse aiAnalysisResponse = modelMapperService.forResponse().map(aiAnalysis,AIAnalysisResponse.class);
-        aiAnalysisResponse.setServiceDomainId(predictedServiceDomainId);
-        aiAnalysisResponse.setDepartmentId(predictedDepartmentId);
+        AIAnalysisResponse aiAnalysisResponse = AIAnalysisResponse.builder()
+                .summary(aiAnalysis.getSummary())
+                .serviceDomainId(predictedServiceDomainId)
+                .riskLevel(aiAnalysis.getRiskLevel())
+                .priority(aiAnalysis.getPriority())
+                .id(aiAnalysis.getId())
+                .departmentId(predictedDepartmentId)
+                .createdAt(aiAnalysis.getCreatedAt())
+                .confidenceScore(aiAnalysis.getConfidenceScore())
+                .complaintId(aiAnalysis.getComplaint().getId())
+                .build();
+
 
         return aiAnalysisResponse;
+    }
+
+    @Override
+    public AIAnalysis getEntityById(Long id) {
+        return aiAnalysisRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("AIAnalysis", "Id", id));
     }
 
 

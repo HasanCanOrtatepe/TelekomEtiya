@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 
@@ -38,6 +39,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new ResourceAlreadyExistsException("Customer", "Phone Number", request.getPhone());
         }
         Customer customer = modelMapperService.forRequest().map(request, Customer.class);
+        customer.setCreatedAt(OffsetDateTime.now());
         Customer saved = customerRepository.save(customer);
         return modelMapperService.forResponse().map(saved, CustomerResponse.class);
     }
@@ -91,4 +93,15 @@ public class CustomerServiceImpl implements CustomerService {
                 )
         );
     }
+
+    @Override
+    public Customer getEntityById(Long id) {
+        return customerRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Customer","Id",id));
+    }
+
+
+
+
 }

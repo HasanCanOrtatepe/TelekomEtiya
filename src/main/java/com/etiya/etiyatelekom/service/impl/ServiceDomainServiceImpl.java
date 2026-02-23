@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -108,5 +109,11 @@ public class ServiceDomainServiceImpl implements ServiceDomainService {
         ServiceDomain serviceDomain=serviceDomainRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Service Domain","Id",id));
         serviceDomain.setIsActive(true);
         serviceDomainRepository.save(serviceDomain);
+    }
+
+    @Override
+    public ServiceDomain getActiveEntityById(Long id) {
+        return serviceDomainRepository.findByIdAndIsActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Service Domain", "Id", id));
     }
 }

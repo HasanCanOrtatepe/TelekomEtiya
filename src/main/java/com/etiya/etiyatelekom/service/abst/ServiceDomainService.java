@@ -4,6 +4,9 @@ import com.etiya.etiyatelekom.api.dto.request.serviceDomainRequest.ServiceDomain
 import com.etiya.etiyatelekom.api.dto.request.serviceDomainRequest.ServiceDomainUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.serviceDomainResponse.ServiceDomainListResponse;
 import com.etiya.etiyatelekom.api.dto.response.serviceDomainResponse.ServiceDomainResponse;
+import com.etiya.etiyatelekom.entity.ServiceDomain;
+
+import java.util.Optional;
 
 
 public interface ServiceDomainService {
@@ -21,4 +24,6 @@ public interface ServiceDomainService {
     void deactivate(Long id);
 
     void activate(Long id);
+
+    ServiceDomain getActiveEntityById(Long id);
 }

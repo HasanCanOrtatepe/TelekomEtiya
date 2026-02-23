@@ -108,4 +108,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         departmentRepository.save(department);
 
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Department getActiveEntityById(Long id) {
+        return departmentRepository.findByIdAndIsActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Department", "Id", id));
+    }
 }

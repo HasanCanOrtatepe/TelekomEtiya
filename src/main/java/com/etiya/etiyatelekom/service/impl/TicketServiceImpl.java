@@ -3,14 +3,17 @@ package com.etiya.etiyatelekom.service.impl;
 import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketAssignRequest;
 import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketUpdateRoutingRequest;
 import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketUpdateStatusRequest;
+import com.etiya.etiyatelekom.api.dto.response.aiAnalysisResponse.AIAnalysisResponse;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketListResponse;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketResponse;
+import com.etiya.etiyatelekom.common.enums.TicketPriorityEnums;
+import com.etiya.etiyatelekom.common.enums.TicketRiskLevelEnums;
 import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
 import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
 import com.etiya.etiyatelekom.entity.*;
 import com.etiya.etiyatelekom.repository.*;
-import com.etiya.etiyatelekom.service.abst.TicketService;
+import com.etiya.etiyatelekom.service.abst.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,11 +29,13 @@ import java.util.List;
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
-    private final AgentRepository agentRepository;
-    private final DepartmentRepository departmentRepository;
-    private final ServiceDomainRepository serviceDomainRepository;
+    private final DepartmentService departmentService;
+    private final ServiceDomainService serviceDomainService;
+    private final AgentService agentService;
     private final ModelMapperService modelMapperService;
-    private final TicketStatusHistoryRepository ticketStatusHistoryRepository;
+    private final ComplaintRepository complaintRepository;
+    private final TicketStatusHistoryService ticketStatusHistoryService;
+    private final EmailNotificationService emailNotificationService;
 
     @Override
     public TicketResponse getById(Long id) {
@@ -99,11 +104,9 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", "id", ticketId));
 
-        Agent agent = agentRepository.findById(request.getAgentId())
-                .orElseThrow(() -> new ResourceNotFoundException("Agent", "id", request.getAgentId()));
-
+        Agent agent = agentService.getActiveEntityById(request.getAgentId());
         ticket.setAssignedAgent(agent);
-        changeticket(ticketId,ticket.getStatus(),TicketStatusEnums.ASSIGNED);
+        changeTicket(ticket,ticket.getStatus(),TicketStatusEnums.ASSIGNED);
 
         ticket.setStatus(TicketStatusEnums.ASSIGNED);
 
@@ -118,7 +121,7 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", "id", ticketId));
 
-        changeticket(ticketId,ticket.getStatus(),request.getStatus());
+        changeTicket(ticket,ticket.getStatus(),request.getStatus());
 
         ticket.setStatus(request.getStatus());
 
@@ -133,14 +136,12 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", "id", ticketId));
 
         if (request.getDepartmentId() != null) {
-            Department department = departmentRepository.findById(request.getDepartmentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Department", "id", request.getDepartmentId()));
+            Department department = departmentService.getActiveEntityById(request.getDepartmentId());
             ticket.setDepartment(department);
         }
 
         if (request.getServiceDomainId() != null) {
-            ServiceDomain domain = serviceDomainRepository.findById(request.getServiceDomainId())
-                    .orElseThrow(() -> new ResourceNotFoundException("ServiceDomain", "id", request.getServiceDomainId()));
+            ServiceDomain domain = serviceDomainService.getActiveEntityById(request.getServiceDomainId());
             ticket.setServiceDomain(domain);
         }
 
@@ -155,11 +156,11 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", "id", ticketId));
 
 
+        changeTicket(ticket,ticket.getStatus(),TicketStatusEnums.CLOSED);
         ticket.setStatus(TicketStatusEnums.CLOSED);
         ticket.setClosedAt(OffsetDateTime.now());
 
         Ticket saved = ticketRepository.save(ticket);
-        changeticket(ticketId,ticket.getStatus(),TicketStatusEnums.CLOSED);
 
         return modelMapperService.forResponse().map(saved, TicketResponse.class);
     }
@@ -181,28 +182,58 @@ public class TicketServiceImpl implements TicketService {
                 .build();
     }
 
-    private void changeticket(Long id,TicketStatusEnums firstStatus,TicketStatusEnums secondStatus){
+    @Override
+    public Ticket create(AIAnalysisResponse aiAnalysisResponse) {
 
-        log.info("1 changeticket");
-
-        Ticket ticket=ticketRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Ticket","Id",id));
-
-        log.info("2 changeticket");
-        Long agentId=null;
-        Agent agent=ticket.getAssignedAgent();
-        if (agent!=null){
-            agentId=agent.getId();
+        if (aiAnalysisResponse==null){
+            throw new ResourceNotFoundException();
         }
 
-        TicketStatusHistory ticketStatusHistory=TicketStatusHistory.builder()
-                .fromStatus(firstStatus)
-                .ticket(ticket)
-                .changedAt(OffsetDateTime.now())
-                .toStatus(secondStatus)
-                .agentId(agentId)
+        Department department = departmentService.getActiveEntityById(aiAnalysisResponse.getDepartmentId());
+        ServiceDomain serviceDomain = serviceDomainService.getActiveEntityById(aiAnalysisResponse.getServiceDomainId());
+
+        Complaint complaint = complaintRepository.findById(aiAnalysisResponse.getComplaintId())
+                .orElseThrow(() -> new ResourceNotFoundException("Complaint", "Id", aiAnalysisResponse.getComplaintId()));
+
+        Ticket ticket=Ticket.builder()
+                .createdAt(OffsetDateTime.now())
+                .priority(aiAnalysisResponse.getPriority())
+                .complaint(complaint)
+                .slaDueAt(OffsetDateTime.now().plusHours(department.getSlaHours()))
+                .department(department)
+                .status(TicketStatusEnums.CREATED)
+                .riskLevel(aiAnalysisResponse.getRiskLevel())
+                .serviceDomain(serviceDomain)
                 .build();
-        log.info("3 changeticket");
-        ticketStatusHistoryRepository.save(ticketStatusHistory);
-        log.info("4 changeticket");
+
+        ticketRepository.save(ticket);
+
+        changeTicket(ticket,null,ticket.getStatus());
+
+        if (ticket.getRiskLevel().equals(TicketRiskLevelEnums.HIGH) &&ticket.getPriority().equals(TicketPriorityEnums.CRITICAL) ){
+            emailNotificationService.sendMail(ticket);
+        }
+
+        return ticket;
     }
+
+    private void changeTicket(Ticket ticket, TicketStatusEnums fromStatus, TicketStatusEnums toStatus) {
+
+        Long agentId = null;
+        Agent agent = ticket.getAssignedAgent();
+        if (agent != null) {
+            agentId = agent.getId();
+        }
+
+        TicketStatusHistory history = TicketStatusHistory.builder()
+                .fromStatus(fromStatus)
+                .toStatus(toStatus)
+                .ticket(ticket)
+                .agentId(agentId)
+                .changedAt(OffsetDateTime.now())
+                .build();
+
+        ticketStatusHistoryService.create(history);
+    }
+
 }

@@ -12,6 +12,7 @@ import com.etiya.etiyatelekom.entity.Subscription;
 import com.etiya.etiyatelekom.repository.CustomerRepository;
 import com.etiya.etiyatelekom.repository.ServiceDomainRepository;
 import com.etiya.etiyatelekom.repository.SubscriptionRepository;
+import com.etiya.etiyatelekom.service.abst.ServiceDomainService;
 import com.etiya.etiyatelekom.service.abst.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,13 +28,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final ModelMapperService modelMapperService;
     private final SubscriptionRepository subscriptionRepository;
-    private final ServiceDomainRepository serviceDomainRepository;
+    private final ServiceDomainService serviceDomainService;
 
 
     @Override
     public SubscriptionResponse create(SubscriptionCreateRequest request) {
-        ServiceDomain serviceDomain=serviceDomainRepository.findById(request.getServiceDomainId())
-                .orElseThrow(()->new ResourceNotFoundException("Service Domain","Id",request.getServiceDomainId()));
+        ServiceDomain serviceDomain=serviceDomainService.getActiveEntityById(request.getServiceDomainId());
 
         Subscription subscription = Subscription.builder()
                 .serviceDomain(serviceDomain)
@@ -51,9 +51,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public SubscriptionResponse update(Long id, SubscriptionUpdateRequest request) {
-        ServiceDomain serviceDomain=serviceDomainRepository.findById(request.getServiceDomainId())
-                .orElseThrow(()->new ResourceNotFoundException("Service Domain","Id",request.getServiceDomainId()));
-
+        ServiceDomain serviceDomain=serviceDomainService.getActiveEntityById(request.getServiceDomainId());
 
         Subscription subscription=subscriptionRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Subscription","Id",id));
@@ -95,4 +93,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         Subscription subscription=subscriptionRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Subscription","Id",id));
         subscriptionRepository.delete(subscription);
     }
+
+    @Override
+    public Subscription getEntityById(Long id) {
+        return subscriptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Subscription", "Id", id));
+    }
+
 }

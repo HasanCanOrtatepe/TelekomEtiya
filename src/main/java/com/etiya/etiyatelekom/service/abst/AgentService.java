@@ -4,6 +4,7 @@ import com.etiya.etiyatelekom.api.dto.request.agentRequest.AgentCreateRequest;
 import com.etiya.etiyatelekom.api.dto.request.agentRequest.AgentUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.agentResponse.AgentListResponse;
 import com.etiya.etiyatelekom.api.dto.response.agentResponse.AgentResponse;
+import com.etiya.etiyatelekom.entity.Agent;
 
 
 public interface AgentService {
@@ -27,4 +28,6 @@ public interface AgentService {
     void deactivate(Long id);
 
     void activate(Long id);
+
+    Agent getActiveEntityById(Long id);
 }

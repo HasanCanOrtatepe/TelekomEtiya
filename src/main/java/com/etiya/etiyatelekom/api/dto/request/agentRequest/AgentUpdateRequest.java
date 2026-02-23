@@ -26,7 +26,5 @@ public class AgentUpdateRequest {
     @NotNull
     private AgentRoleEnums role;
 
-    @NotNull
-    private Boolean isActive;
 
 }

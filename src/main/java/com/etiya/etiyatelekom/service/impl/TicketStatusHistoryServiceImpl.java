@@ -24,7 +24,6 @@ public class TicketStatusHistoryServiceImpl implements TicketStatusHistoryServic
     private final ModelMapperService modelMapperService;
 
 
-
     @Override
     public TicketStatusHistoryResponse getById(Long id) {
         TicketStatusHistory ticketStatusHistory=ticketStatusHistoryRepository.findById(id)
@@ -103,5 +102,10 @@ public class TicketStatusHistoryServiceImpl implements TicketStatusHistoryServic
                 .build();
 
         return ticketStatusHistoryListResponse;
+    }
+
+    @Override
+    public TicketStatusHistory create(TicketStatusHistory history) {
+        return ticketStatusHistoryRepository.save(history);
     }
 }

@@ -5,13 +5,14 @@ import com.etiya.etiyatelekom.api.dto.request.complaintRequest.ComplaintCreateRe
 import com.etiya.etiyatelekom.api.dto.response.aiAnalysisResponse.AIAnalysisResponse;
 import com.etiya.etiyatelekom.api.dto.response.complaintResponse.ComplaintListResponse;
 import com.etiya.etiyatelekom.api.dto.response.complaintResponse.ComplaintResponse;
-import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
 import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
 import com.etiya.etiyatelekom.entity.*;
 import com.etiya.etiyatelekom.repository.*;
 import com.etiya.etiyatelekom.service.abst.AIAnalysisService;
 import com.etiya.etiyatelekom.service.abst.ComplaintService;
+import com.etiya.etiyatelekom.service.abst.CustomerService;
+import com.etiya.etiyatelekom.service.abst.TicketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,20 +28,16 @@ import java.util.List;
 public class ComplaintServiceImpl implements ComplaintService {
 
     private final ComplaintRepository complaintRepository;
-    private final CustomerRepository customerRepository;
+    private final CustomerService customerService;
     private final ModelMapperService modelMapperService;
     private final AIAnalysisService aiAnalysisService;
-    private final DepartmentRepository departmentRepository;
-    private final ServiceDomainRepository serviceDomainRepository;
-    private final TicketRepository ticketRepository;
-    private final TicketStatusHistoryRepository ticketStatusHistoryRepository;
+    private final TicketService ticketService;
 
 
     @Override
     public ComplaintResponse create(ComplaintCreateRequest request) {
 
-        Customer customer =customerRepository.findById(request.getCustomerId())
-                .orElseThrow(()-> new ResourceNotFoundException("Customer","Id",request.getCustomerId()));
+        Customer customer =customerService.getEntityById(request.getCustomerId());
 
         Complaint complaint=Complaint.builder()
                 .title(request.getTitle())
@@ -49,53 +46,20 @@ public class ComplaintServiceImpl implements ComplaintService {
                 .createdAt(OffsetDateTime.now())
                 .build();
 
-        log.info(" 4  Burda ");
         complaintRepository.save(complaint);
 
-        log.info(" 5  Burda ");
+        AIAnalysisResponse aiAnalysisResponse=aiAnalysisService.create(complaint);
+        log.info(aiAnalysisResponse.toString());
 
-        AIAnalysisResponse aiAnalysisResponse=aiAnalysisService.create(complaint.getId());
+        Ticket ticket= ticketService.create(aiAnalysisResponse);
 
-        log.info(" 6  Burda ");
-
-        Department department=departmentRepository.findById(aiAnalysisResponse.getDepartmentId())
-                .orElseThrow(()->new ResourceNotFoundException("Department","Id",aiAnalysisResponse.getDepartmentId()));
-
-        ServiceDomain serviceDomain= serviceDomainRepository.findById(aiAnalysisResponse.getServiceDomainId())
-                .orElseThrow(()->new ResourceNotFoundException("Service Domain","Id",aiAnalysisResponse.getServiceDomainId()));
-
-        Ticket ticket=Ticket.builder()
-                .createdAt(OffsetDateTime.now())
-                .priority(aiAnalysisResponse.getPriority())
-                .complaint(complaint)
-                .slaDueAt(OffsetDateTime.now().plusHours(department.getSlaHours()))
-                .department(department)
-                .status(TicketStatusEnums.CREATED)
-                .riskLevel(aiAnalysisResponse.getRiskLevel())
-                .serviceDomain(serviceDomain)
-                .build();
-
-        log.info(" 7  Burda ");
-        ticketRepository.save(ticket);
-        AIAnalysis analysis= AIAnalysis.builder()
-                .complaint(complaint)
-                .confidenceScore(aiAnalysisResponse.getConfidenceScore())
-                .createdAt(aiAnalysisResponse.getCreatedAt())
-                .priority(aiAnalysisResponse.getPriority())
-                .riskLevel(aiAnalysisResponse.getRiskLevel())
-                .summary(aiAnalysisResponse.getSummary())
-                .id(aiAnalysisResponse.getId())
-                .build();
-
+        AIAnalysis analysis = aiAnalysisService.getEntityById(aiAnalysisResponse.getId());
         complaint.setAiAnalysis(analysis);
         complaint.setTicket(ticket);
 
-        complaintRepository.save(complaint);
-
         ComplaintResponse complaintResponse=modelMapperService.forResponse().map(complaint,ComplaintResponse.class);
-        changeticket(ticket.getId(),ticket.getStatus());
 
-        log.info(" 8  Burda ");
+        complaintRepository.save(complaint);
         return complaintResponse;
     }
 
@@ -152,24 +116,11 @@ public class ComplaintServiceImpl implements ComplaintService {
 
     }
 
-    private void changeticket(Long id,TicketStatusEnums status){
-
-        log.info("1 changeticket");
-
-        Ticket ticket=ticketRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Ticket","Id",id));
-
-        log.info("2 changeticket");
-
-
-        TicketStatusHistory ticketStatusHistory=TicketStatusHistory.builder()
-                .fromStatus(null)
-                .ticket(ticket)
-                .changedAt(OffsetDateTime.now())
-                .toStatus(status)
-                .build();
-        log.info("3 changeticket");
-        ticketStatusHistoryRepository.save(ticketStatusHistory);
-        log.info("4 changeticket");
+    @Override
+    public Complaint getEntityById(Long id) {
+        return complaintRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Complaint", "Id", id));
     }
+
 
 }

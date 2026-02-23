@@ -4,9 +4,11 @@ package com.etiya.etiyatelekom.service.abst;
 import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketAssignRequest;
 import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketUpdateRoutingRequest;
 import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketUpdateStatusRequest;
+import com.etiya.etiyatelekom.api.dto.response.aiAnalysisResponse.AIAnalysisResponse;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketListResponse;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketResponse;
 import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
+import com.etiya.etiyatelekom.entity.Ticket;
 
 public interface TicketService {
 
@@ -29,5 +31,7 @@ public interface TicketService {
     TicketResponse close(Long ticketId);
 
     TicketListResponse getSlaBreached();
+
+    Ticket create(AIAnalysisResponse aiAnalysisResponse);
 }
 
