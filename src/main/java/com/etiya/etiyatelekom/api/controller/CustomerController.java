@@ -8,11 +8,13 @@ import com.etiya.etiyatelekom.service.abst.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/customers")
+@PreAuthorize("hasRole('ADMIN')")
 public class CustomerController {
 
     private final CustomerService customerService;
@@ -38,7 +40,7 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getAll());
     }
 
-    @DeleteMapping("/{id}/delete")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         customerService.delete(id);
         return ResponseEntity.noContent().build();

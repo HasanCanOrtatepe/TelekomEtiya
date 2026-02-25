@@ -25,6 +25,8 @@ public interface AgentService {
 
     AgentListResponse getAvailableAgents(Long departmentId, Long serviceDomainId);
 
+    AgentListResponse getNonAdminAgents();
+
     void deactivate(Long id);
 
     void activate(Long id);

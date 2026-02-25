@@ -9,13 +9,11 @@ import com.etiya.etiyatelekom.entity.TicketStatusHistory;
 import com.etiya.etiyatelekom.repository.TicketStatusHistoryRepository;
 import com.etiya.etiyatelekom.service.abst.TicketStatusHistoryService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -82,7 +80,6 @@ public class TicketStatusHistoryServiceImpl implements TicketStatusHistoryServic
     public TicketStatusHistoryListResponse getAll() {
 
         List<TicketStatusHistory> ticketStatusHistories=ticketStatusHistoryRepository.findAll();
-        ticketStatusHistories.forEach(ticketStatusHistory -> log.info(ticketStatusHistories.toString()));
         List<TicketStatusHistoryResponse> ticketStatusHistoryResponses=ticketStatusHistories.stream()
                 .map(ticketStatusHistory -> TicketStatusHistoryResponse.builder()
                         .changedAt(ticketStatusHistory.getChangedAt())
@@ -93,8 +90,6 @@ public class TicketStatusHistoryServiceImpl implements TicketStatusHistoryServic
                         .AgentId(ticketStatusHistory.getAgentId())
                         .build())
                 .toList();
-
-        ticketStatusHistoryResponses.forEach(ticketStatusHistoryResponse -> log.info(ticketStatusHistoryResponse.toString()));
 
         TicketStatusHistoryListResponse ticketStatusHistoryListResponse=TicketStatusHistoryListResponse.builder()
                 .items(ticketStatusHistoryResponses)

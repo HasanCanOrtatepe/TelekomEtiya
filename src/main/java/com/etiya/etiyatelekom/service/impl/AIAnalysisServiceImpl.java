@@ -9,20 +9,16 @@ import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
 import com.etiya.etiyatelekom.entity.AIAnalysis;
 import com.etiya.etiyatelekom.entity.Complaint;
 import com.etiya.etiyatelekom.repository.AIAnalysisRepository;
-import com.etiya.etiyatelekom.repository.DepartmentRepository;
-import com.etiya.etiyatelekom.repository.ServiceDomainRepository;
 import com.etiya.etiyatelekom.service.abst.AIAnalysisService;
 import com.etiya.etiyatelekom.service.abst.DepartmentService;
 import com.etiya.etiyatelekom.service.abst.ServiceDomainService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional

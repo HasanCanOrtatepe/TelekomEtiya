@@ -1,7 +1,7 @@
 package com.etiya.etiyatelekom.repository;
 
-import com.etiya.etiyatelekom.entity.Complaint;
-import com.etiya.etiyatelekom.entity.Customer;
+import com.etiya.etiyatelekom.common.enums.SubscriptionStatus;
+
 import com.etiya.etiyatelekom.entity.CustomerSubscription;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,10 +12,8 @@ public interface CustomerSubscriptionRepository extends JpaRepository<CustomerSu
     boolean existsByCustomerIdAndSubscriptionId(Long customerId, Long subscriptionId);
 
     List<CustomerSubscription> findByCustomerId(Long customerId);
-    boolean existsByCustomerId(Long customerId);
 
-    List<CustomerSubscription> findByCustomerIdAndStatus(Long customerId, String status);
-    boolean existsByCustomerIdAndStatus(Long customerId, String status);
+    List<CustomerSubscription> findByCustomerIdAndStatus(Long customerId, SubscriptionStatus subscriptionStatus);
 
 
 }

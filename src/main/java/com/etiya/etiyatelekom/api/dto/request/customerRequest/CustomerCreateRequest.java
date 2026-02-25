@@ -34,4 +34,8 @@ public class CustomerCreateRequest {
     @Pattern(regexp = ValidationPatterns.PHONE, message = "phone must contain only digits and +() - spaces")
     @Size(max = 30)
     private String phone;
+
+    @Size(min = 8, max = 100)
+    @NotBlank
+    private String password;
 }

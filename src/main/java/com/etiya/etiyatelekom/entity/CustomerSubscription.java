@@ -27,11 +27,11 @@ public class CustomerSubscription {
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
 
-
     private OffsetDateTime startDate;
 
     private OffsetDateTime endDate;
 
+    @Enumerated(EnumType.STRING)
     private SubscriptionStatus status;
 
 }

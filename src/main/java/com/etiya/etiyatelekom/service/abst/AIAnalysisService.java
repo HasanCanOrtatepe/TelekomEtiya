@@ -1,7 +1,6 @@
 package com.etiya.etiyatelekom.service.abst;
 
 
-import com.etiya.etiyatelekom.api.dto.request.aiAnalysisRequest.AIAnalysisUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.aiAnalysisResponse.AIAnalysisListResponse;
 import com.etiya.etiyatelekom.api.dto.response.aiAnalysisResponse.AIAnalysisResponse;
 import com.etiya.etiyatelekom.entity.AIAnalysis;

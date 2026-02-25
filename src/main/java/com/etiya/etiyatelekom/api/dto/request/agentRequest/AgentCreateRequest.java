@@ -26,4 +26,8 @@ public class AgentCreateRequest {
 
     @NotNull
     private AgentRoleEnums role;
+
+    @Size(min = 8, max = 100)
+    @NotBlank
+    private String password;
 }

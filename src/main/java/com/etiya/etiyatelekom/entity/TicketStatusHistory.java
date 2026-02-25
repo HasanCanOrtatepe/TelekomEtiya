@@ -24,8 +24,10 @@ public class TicketStatusHistory {
     @JoinColumn(name = "ticket_id")
     private Ticket ticket;
 
+    @Enumerated(EnumType.STRING)
     private TicketStatusEnums fromStatus;
 
+    @Enumerated(EnumType.STRING)
     private TicketStatusEnums toStatus;
 
     private OffsetDateTime changedAt;

@@ -6,11 +6,8 @@ import com.etiya.etiyatelekom.api.dto.response.subscriptionResponse.Subscription
 import com.etiya.etiyatelekom.api.dto.response.subscriptionResponse.SubscriptionResponse;
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
 import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
-import com.etiya.etiyatelekom.entity.Customer;
 import com.etiya.etiyatelekom.entity.ServiceDomain;
 import com.etiya.etiyatelekom.entity.Subscription;
-import com.etiya.etiyatelekom.repository.CustomerRepository;
-import com.etiya.etiyatelekom.repository.ServiceDomainRepository;
 import com.etiya.etiyatelekom.repository.SubscriptionRepository;
 import com.etiya.etiyatelekom.service.abst.ServiceDomainService;
 import com.etiya.etiyatelekom.service.abst.SubscriptionService;

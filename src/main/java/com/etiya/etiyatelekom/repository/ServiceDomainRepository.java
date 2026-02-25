@@ -1,6 +1,5 @@
 package com.etiya.etiyatelekom.repository;
 
-import com.etiya.etiyatelekom.entity.Agent;
 import com.etiya.etiyatelekom.entity.ServiceDomain;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,7 +10,6 @@ public interface ServiceDomainRepository extends JpaRepository<ServiceDomain,Lon
 
     boolean existsByNameIgnoreCase(String name);
     List<ServiceDomain> findByIsActiveTrue();
-    boolean existsByIdIsNotNull();
     Optional<ServiceDomain> findByIdAndIsActiveTrue(Long id);
 
 }

@@ -8,9 +8,11 @@ import com.etiya.etiyatelekom.common.exception.exceptions.ResourceAlreadyExistsE
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
 import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
 import com.etiya.etiyatelekom.entity.Customer;
+import com.etiya.etiyatelekom.repository.AgentRepository;
 import com.etiya.etiyatelekom.repository.CustomerRepository;
 import com.etiya.etiyatelekom.service.abst.CustomerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +26,18 @@ import java.util.List;
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
+    private final AgentRepository agentRepository;
     private final ModelMapperService modelMapperService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public CustomerResponse create(CustomerCreateRequest request) {
 
         if (customerRepository.existsByEmail(request.getEmail())) {
             throw new ResourceAlreadyExistsException("Customer", "Email", request.getEmail());
+        }
+        if (agentRepository.existsByEmail(request.getEmail())) {
+            throw new ResourceAlreadyExistsException("Agent", "Email", request.getEmail());
         }
         if (customerRepository.existsByCustomerNo(request.getCustomerNo())) {
             throw new ResourceAlreadyExistsException("Customer", "Customer No", request.getCustomerNo());
@@ -40,6 +47,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
         Customer customer = modelMapperService.forRequest().map(request, Customer.class);
         customer.setCreatedAt(OffsetDateTime.now());
+        customer.setPassword(passwordEncoder.encode(request.getPassword()));
         Customer saved = customerRepository.save(customer);
         return modelMapperService.forResponse().map(saved, CustomerResponse.class);
     }
@@ -49,8 +57,13 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", id));
 
-        if (!customer.getEmail().equalsIgnoreCase(request.getEmail()) && customerRepository.existsByEmail(request.getEmail())) {
-            throw new ResourceAlreadyExistsException("Customer", "Email", request.getEmail());
+        if (!customer.getEmail().equalsIgnoreCase(request.getEmail())) {
+            if (customerRepository.existsByEmail(request.getEmail())) {
+                throw new ResourceAlreadyExistsException("Customer", "Email", request.getEmail());
+            }
+            if (agentRepository.existsByEmail(request.getEmail())) {
+                throw new ResourceAlreadyExistsException("Agent", "Email", request.getEmail());
+            }
         }
         if (!customer.getPhone().equalsIgnoreCase(request.getPhone()) && customerRepository.existsByPhone(request.getPhone())) {
             throw new ResourceAlreadyExistsException("Customer", "Phone Number", request.getPhone());

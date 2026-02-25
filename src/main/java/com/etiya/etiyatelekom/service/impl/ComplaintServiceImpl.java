@@ -14,14 +14,12 @@ import com.etiya.etiyatelekom.service.abst.ComplaintService;
 import com.etiya.etiyatelekom.service.abst.CustomerService;
 import com.etiya.etiyatelekom.service.abst.TicketService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -49,7 +47,6 @@ public class ComplaintServiceImpl implements ComplaintService {
         complaintRepository.save(complaint);
 
         AIAnalysisResponse aiAnalysisResponse=aiAnalysisService.create(complaint);
-        log.info(aiAnalysisResponse.toString());
 
         Ticket ticket= ticketService.create(aiAnalysisResponse);
 

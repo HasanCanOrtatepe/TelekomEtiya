@@ -9,20 +9,19 @@ import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketResponse;
 import com.etiya.etiyatelekom.common.enums.TicketPriorityEnums;
 import com.etiya.etiyatelekom.common.enums.TicketRiskLevelEnums;
 import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
+import com.etiya.etiyatelekom.common.exception.exceptions.InvalidTicketStatusTransitionException;
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
 import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
 import com.etiya.etiyatelekom.entity.*;
 import com.etiya.etiyatelekom.repository.*;
 import com.etiya.etiyatelekom.service.abst.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -106,14 +105,12 @@ public class TicketServiceImpl implements TicketService {
 
         Agent agent = agentService.getActiveEntityById(request.getAgentId());
         ticket.setAssignedAgent(agent);
-        changeTicket(ticket,ticket.getStatus(),TicketStatusEnums.ASSIGNED);
 
-        ticket.setStatus(TicketStatusEnums.ASSIGNED);
-
-        Ticket saved = ticketRepository.save(ticket);
+        Ticket saved = changeStatus(ticket, TicketStatusEnums.ASSIGNED);
 
         return modelMapperService.forResponse().map(saved, TicketResponse.class);
     }
+
 
     @Override
     public TicketResponse updateStatus(Long ticketId, TicketUpdateStatusRequest request) {
@@ -121,11 +118,8 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", "id", ticketId));
 
-        changeTicket(ticket,ticket.getStatus(),request.getStatus());
+        Ticket saved = changeStatus(ticket, request.getStatus());
 
-        ticket.setStatus(request.getStatus());
-
-        Ticket saved = ticketRepository.save(ticket);
         return modelMapperService.forResponse().map(saved, TicketResponse.class);
     }
 
@@ -155,12 +149,11 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", "id", ticketId));
 
+        if (ticket.getStatus() == TicketStatusEnums.CLOSED) {
+            return modelMapperService.forResponse().map(ticket, TicketResponse.class);
+        }
 
-        changeTicket(ticket,ticket.getStatus(),TicketStatusEnums.CLOSED);
-        ticket.setStatus(TicketStatusEnums.CLOSED);
-        ticket.setClosedAt(OffsetDateTime.now());
-
-        Ticket saved = ticketRepository.save(ticket);
+        Ticket saved = changeStatus(ticket, TicketStatusEnums.CLOSED);
 
         return modelMapperService.forResponse().map(saved, TicketResponse.class);
     }
@@ -185,7 +178,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public Ticket create(AIAnalysisResponse aiAnalysisResponse) {
 
-        if (aiAnalysisResponse==null){
+        if (aiAnalysisResponse == null) {
             throw new ResourceNotFoundException();
         }
 
@@ -195,26 +188,24 @@ public class TicketServiceImpl implements TicketService {
         Complaint complaint = complaintRepository.findById(aiAnalysisResponse.getComplaintId())
                 .orElseThrow(() -> new ResourceNotFoundException("Complaint", "Id", aiAnalysisResponse.getComplaintId()));
 
-        Ticket ticket=Ticket.builder()
+        Ticket ticket = Ticket.builder()
                 .createdAt(OffsetDateTime.now())
                 .priority(aiAnalysisResponse.getPriority())
                 .complaint(complaint)
                 .slaDueAt(OffsetDateTime.now().plusHours(department.getSlaHours()))
                 .department(department)
-                .status(TicketStatusEnums.CREATED)
+                .status(null) // <<< önemli: null bırak
                 .riskLevel(aiAnalysisResponse.getRiskLevel())
                 .serviceDomain(serviceDomain)
                 .build();
 
-        ticketRepository.save(ticket);
+        Ticket saved = changeStatus(ticket, TicketStatusEnums.CREATED);
 
-        changeTicket(ticket,null,ticket.getStatus());
-
-        if (ticket.getRiskLevel().equals(TicketRiskLevelEnums.HIGH) &&ticket.getPriority().equals(TicketPriorityEnums.CRITICAL) ){
-            emailNotificationService.sendMail(ticket);
+        if (saved.getRiskLevel() == TicketRiskLevelEnums.HIGH && saved.getPriority() == TicketPriorityEnums.CRITICAL) {
+            emailNotificationService.sendMail(saved);
         }
 
-        return ticket;
+        return saved;
     }
 
     private void changeTicket(Ticket ticket, TicketStatusEnums fromStatus, TicketStatusEnums toStatus) {
@@ -234,6 +225,32 @@ public class TicketServiceImpl implements TicketService {
                 .build();
 
         ticketStatusHistoryService.create(history);
+    }
+
+    private Ticket changeStatus(Ticket ticket, TicketStatusEnums toStatus) {
+        TicketStatusEnums fromStatus = ticket.getStatus();
+
+        if (fromStatus == toStatus) {
+            return ticket;
+        }
+
+        if (fromStatus != null && !fromStatus.canTransitionTo(toStatus)) {
+            throw new InvalidTicketStatusTransitionException(fromStatus, toStatus);
+        }
+
+        ticket.setStatus(toStatus);
+
+        if (toStatus == TicketStatusEnums.CLOSED && ticket.getClosedAt() == null) {
+            ticket.setClosedAt(OffsetDateTime.now());
+        }
+
+        if (ticket.getId() == null) {
+            ticket = ticketRepository.save(ticket);
+        }
+
+        changeTicket(ticket, fromStatus, toStatus);
+
+        return ticketRepository.save(ticket);
     }
 
 }

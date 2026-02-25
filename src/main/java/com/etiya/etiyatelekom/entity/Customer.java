@@ -31,6 +31,8 @@ public class Customer {
 
     private String phone;
 
+    private String password;
+
     private OffsetDateTime createdAt;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)

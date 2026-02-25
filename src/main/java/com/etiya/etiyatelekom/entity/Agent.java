@@ -32,5 +32,7 @@ public class Agent {
 
     private AgentRoleEnums role;
 
+    private String password;
+
     private Boolean isActive;
 }

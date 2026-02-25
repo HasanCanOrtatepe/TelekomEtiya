@@ -4,41 +4,45 @@ import com.etiya.etiyatelekom.api.dto.request.agentRequest.AgentCreateRequest;
 import com.etiya.etiyatelekom.api.dto.request.agentRequest.AgentUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.agentResponse.AgentListResponse;
 import com.etiya.etiyatelekom.api.dto.response.agentResponse.AgentResponse;
+import com.etiya.etiyatelekom.common.exception.exceptions.CannotDeactivateAdminException;
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceAlreadyExistsException;
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
 import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
+import com.etiya.etiyatelekom.common.enums.AgentRoleEnums;
 import com.etiya.etiyatelekom.entity.Agent;
-import com.etiya.etiyatelekom.entity.Department;
 import com.etiya.etiyatelekom.repository.AgentRepository;
-import com.etiya.etiyatelekom.repository.DepartmentRepository;
-import com.etiya.etiyatelekom.repository.ServiceDomainRepository;
+import com.etiya.etiyatelekom.repository.CustomerRepository;
 import com.etiya.etiyatelekom.service.abst.AgentService;
 import com.etiya.etiyatelekom.service.abst.DepartmentService;
 import com.etiya.etiyatelekom.service.abst.ServiceDomainService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class AgentServiceImpl implements AgentService {
 
     private final AgentRepository agentRepository;
+    private final CustomerRepository customerRepository;
     private final DepartmentService departmentService;
     private final ServiceDomainService serviceDomainService;
     private final ModelMapperService modelMapperService;
-
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
     public AgentResponse create(AgentCreateRequest request) {
+        if (agentRepository.existsByEmail(request.getEmail())) {
+            throw new ResourceAlreadyExistsException("Agent", "Email", request.getEmail());
+        }
+        if (customerRepository.existsByEmail(request.getEmail())) {
+            throw new ResourceAlreadyExistsException("Customer", "Email", request.getEmail());
+        }
 
         Agent agent=Agent.builder()
                 .fullName(request.getFullName())
@@ -48,22 +52,14 @@ public class AgentServiceImpl implements AgentService {
 
         agent.setIsActive(true);
 
-        if (request.getDepartmentId()!=null){
-            agent.setDepartment(departmentService.getActiveEntityById(request.getDepartmentId()));
 
-        }
+        agent.setDepartment(departmentService.getActiveEntityById(request.getDepartmentId()));
+        agent.setServiceDomain(serviceDomainService.getActiveEntityById(request.getServiceDomainId()));
+        agent.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        if (request.getServiceDomainId()!=null){
-            agent.setServiceDomain(serviceDomainService.getActiveEntityById(request.getServiceDomainId()));
-        }
-
-        log.info("1 Hata burda mı?");
-        log.info(agent.toString());
         agentRepository.save(agent);
-        log.info("2 Hata burda mı?");
 
         AgentResponse agentResponse=modelMapperService.forResponse().map(agent,AgentResponse.class);
-
 
         return agentResponse;
     }
@@ -82,8 +78,13 @@ public class AgentServiceImpl implements AgentService {
         if (request.getServiceDomainId()!=null){
             agent.setServiceDomain(serviceDomainService.getActiveEntityById(request.getServiceDomainId()));
         }
-        if (agentRepository.existsByEmail(request.getEmail()) && !agent.getEmail().equalsIgnoreCase(request.getEmail())){
-            throw new ResourceAlreadyExistsException("Agent","Email",request.getEmail());
+        if (!agent.getEmail().equalsIgnoreCase(request.getEmail())) {
+            if (agentRepository.existsByEmail(request.getEmail())) {
+                throw new ResourceAlreadyExistsException("Agent", "Email", request.getEmail());
+            }
+            if (customerRepository.existsByEmail(request.getEmail())) {
+                throw new ResourceAlreadyExistsException("Customer", "Email", request.getEmail());
+            }
         }
         agent.setFullName(request.getFullName());
         agent.setEmail(request.getEmail());
@@ -180,17 +181,30 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
+    public AgentListResponse getNonAdminAgents() {
+        List<Agent> agents = agentRepository.findByRoleNot(AgentRoleEnums.ADMIN);
+        List<AgentResponse> agentResponseList = agents.stream()
+                .map(agent -> modelMapperService.forResponse().map(agent, AgentResponse.class))
+                .toList();
+        return AgentListResponse.builder()
+                .agents(agentResponseList)
+                .count(agentResponseList.size())
+                .build();
+    }
+
+    @Override
     public void deactivate(Long id) {
-        Agent agent=agentRepository.findById(id)
-                .orElseThrow(()->new ResourceNotFoundException());
+        Agent agent = agentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Agent", "Id", id));
+        if (agent.getRole() == AgentRoleEnums.ADMIN) {
+            throw new CannotDeactivateAdminException();
+        }
         agent.setIsActive(false);
         agentRepository.save(agent);
-
     }
 
     @Override
     public void activate(Long id) {
-        Agent agent=agentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException());
+        Agent agent=agentRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Agent","Id",id));
         agent.setIsActive(true);
         agentRepository.save(agent);
 
