@@ -22,4 +22,8 @@ public class ComplaintResponse {
 
     private Long aiAnalysisId;
     private Long ticketId;
+    private Long departmentId;
+    private Long serviceDomainId;
+    /** İçerik şikayet olarak kabul edilmediyse kullanıcıya gösterilecek mesaj */
+    private String validationMessage;
 }

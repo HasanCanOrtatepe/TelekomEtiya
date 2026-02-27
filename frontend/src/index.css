@@ -1,0 +1,55 @@
+:root {
+  --primary: rgb(245, 130, 32);
+  --primary-hex: #F58220;
+  --secondary: rgb(36, 36, 65);
+  --secondary-hex: #242441;
+  --secondary-light: rgb(52, 52, 85);
+  --secondary-dark: rgb(24, 24, 45);
+  --primary-hover: rgb(255, 150, 50);
+  --text-on-primary: #fff;
+  --text-on-secondary: #fff;
+  --text-muted: rgba(255, 255, 255, 0.7);
+  --surface: #f8f9fa;
+  --border: rgba(36, 36, 65, 0.15);
+  --success: #22c55e;
+  --warning: #eab308;
+  --error: #ef4444;
+  --font: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--secondary);
+  background: var(--surface);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, textarea {
+  font-family: inherit;
+}

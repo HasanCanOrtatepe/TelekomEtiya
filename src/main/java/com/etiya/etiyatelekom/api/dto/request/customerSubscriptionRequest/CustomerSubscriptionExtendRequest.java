@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 public class CustomerSubscriptionExtendRequest {
 
-    @NotNull(message = "days is required")
-    @Positive(message = "days must be positive")
+    @NotNull()
+    @Positive()
     private Integer days;
 }

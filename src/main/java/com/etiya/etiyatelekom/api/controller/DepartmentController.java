@@ -4,7 +4,7 @@ import com.etiya.etiyatelekom.api.dto.request.departmentRequest.DepartmentCreate
 import com.etiya.etiyatelekom.api.dto.request.departmentRequest.DepartmentUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.departmentResponse.DepartmentListResponse;
 import com.etiya.etiyatelekom.api.dto.response.departmentResponse.DepartmentResponse;
-import com.etiya.etiyatelekom.service.abst.DepartmentService;
+import com.etiya.etiyatelekom.business.abst.DepartmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -4,7 +4,7 @@ import com.etiya.etiyatelekom.api.dto.request.agentRequest.AgentCreateRequest;
 import com.etiya.etiyatelekom.api.dto.request.agentRequest.AgentUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.agentResponse.AgentListResponse;
 import com.etiya.etiyatelekom.api.dto.response.agentResponse.AgentResponse;
-import com.etiya.etiyatelekom.service.abst.AgentService;
+import com.etiya.etiyatelekom.business.abst.AgentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

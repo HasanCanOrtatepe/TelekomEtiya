@@ -36,4 +36,8 @@ public class AIAnalysis {
     private Float confidenceScore;
 
     private OffsetDateTime createdAt;
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    @Builder.Default
+    private Boolean isActive = true;
 }

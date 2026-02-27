@@ -27,7 +27,7 @@ public class CustomerUpdateRequest {
     @Size(max = 150)
     private String email;
 
-    @Pattern(regexp = ValidationPatterns.PHONE, message = "phone must contain only digits and +() - spaces")
+    @Pattern(regexp = ValidationPatterns.PHONE)
     @Size(max = 30)
     private String phone;
 }

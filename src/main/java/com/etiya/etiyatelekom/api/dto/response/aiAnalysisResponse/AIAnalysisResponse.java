@@ -29,4 +29,7 @@ public class AIAnalysisResponse {
 
     private Long serviceDomainId;
     private Long departmentId;
+
+    /** Geçerli bir telekom şikayeti mi (değilse ticket oluşturulmaz) */
+    private Boolean isRelevantComplaint;
 }

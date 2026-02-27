@@ -13,4 +13,9 @@ public class DepartmentResponse {
     private String name;
     private Integer slaHours;
     private Boolean isActive;
+
+    @Override
+    public String toString() {
+        return "id=" + id + ", name='" + name ;
+    }
 }

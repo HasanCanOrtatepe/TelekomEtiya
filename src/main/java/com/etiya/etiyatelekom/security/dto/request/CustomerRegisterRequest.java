@@ -26,14 +26,14 @@ public class CustomerRegisterRequest {
     @Size(max = 150)
     private String email;
 
-    @Pattern(regexp = ValidationPatterns.PHONE, message = "Phone must contain only digits and +() - spaces")
+    @Pattern(regexp = ValidationPatterns.PHONE)
     @Size(max = 30)
     private String phone;
 
-    @NotBlank(message = "Password is required")
+    @NotBlank()
     @Size(min = 8, max = 100)
     private String password;
 
-    @NotBlank(message = "Password confirmation is required")
+    @NotBlank()
     private String confirmPassword;
 }

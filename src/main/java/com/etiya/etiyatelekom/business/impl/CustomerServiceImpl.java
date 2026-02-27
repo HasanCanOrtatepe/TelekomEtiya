@@ -1,0 +1,120 @@
+package com.etiya.etiyatelekom.business.impl;
+
+import com.etiya.etiyatelekom.api.dto.request.customerRequest.CustomerCreateRequest;
+import com.etiya.etiyatelekom.api.dto.request.customerRequest.CustomerUpdateRequest;
+import com.etiya.etiyatelekom.api.dto.response.customerResponse.CustomerResponse;
+import com.etiya.etiyatelekom.api.dto.response.customerResponse.CustomerResponseList;
+import com.etiya.etiyatelekom.common.exception.exceptions.ResourceAlreadyExistsException;
+import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
+import com.etiya.etiyatelekom.common.mapper.ModelMapperService;
+import com.etiya.etiyatelekom.entity.Customer;
+import com.etiya.etiyatelekom.repository.AgentRepository;
+import com.etiya.etiyatelekom.repository.CustomerRepository;
+import com.etiya.etiyatelekom.business.abst.CustomerService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class CustomerServiceImpl implements CustomerService {
+
+    private final CustomerRepository customerRepository;
+    private final AgentRepository agentRepository;
+    private final ModelMapperService modelMapperService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public CustomerResponse create(CustomerCreateRequest request) {
+
+        if (customerRepository.existsByEmail(request.getEmail())) {
+            throw new ResourceAlreadyExistsException("Customer", "Email", request.getEmail());
+        }
+        if (agentRepository.existsByEmail(request.getEmail())) {
+            throw new ResourceAlreadyExistsException("Agent", "Email", request.getEmail());
+        }
+        if (customerRepository.existsByCustomerNo(request.getCustomerNo())) {
+            throw new ResourceAlreadyExistsException("Customer", "Customer No", request.getCustomerNo());
+        }
+        if (customerRepository.existsByPhone(request.getPhone())) {
+            throw new ResourceAlreadyExistsException("Customer", "Phone Number", request.getPhone());
+        }
+        Customer customer = modelMapperService.forRequest().map(request, Customer.class);
+        customer.setCreatedAt(OffsetDateTime.now());
+        customer.setPassword(passwordEncoder.encode(request.getPassword()));
+        Customer saved = customerRepository.save(customer);
+        return modelMapperService.forResponse().map(saved, CustomerResponse.class);
+    }
+
+    @Override
+    public CustomerResponse update(Long id, CustomerUpdateRequest request) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", id));
+
+        if (!customer.getEmail().equalsIgnoreCase(request.getEmail())) {
+            if (customerRepository.existsByEmail(request.getEmail())) {
+                throw new ResourceAlreadyExistsException("Customer", "Email", request.getEmail());
+            }
+            if (agentRepository.existsByEmail(request.getEmail())) {
+                throw new ResourceAlreadyExistsException("Agent", "Email", request.getEmail());
+            }
+        }
+        if (!customer.getPhone().equalsIgnoreCase(request.getPhone()) && customerRepository.existsByPhone(request.getPhone())) {
+            throw new ResourceAlreadyExistsException("Customer", "Phone Number", request.getPhone());
+        }
+
+        modelMapperService.forRequest().map(request, customer);
+        Customer saved= customerRepository.save(customer);
+
+        return modelMapperService.forResponse().map(saved, CustomerResponse.class);
+    }
+
+    @Override
+    public CustomerResponse getById(Long id) {
+        Customer customer = customerRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Customer","id",id));
+        return modelMapperService.forResponse().map(customer,CustomerResponse.class);
+    }
+
+    @Override
+    public CustomerResponseList getAll() {
+
+        List<Customer> customers =customerRepository.findAll();
+        List<CustomerResponse> customerResponses= customers.stream().map(c-> modelMapperService.forResponse().map(c,CustomerResponse.class)).toList();
+        return CustomerResponseList.builder()
+                .customerResponses(customerResponses)
+                .count(customerResponses.size())
+                .build();
+    }
+
+    @Override
+    public CustomerResponseList search(String query) {
+
+        return null;
+    }
+
+    @Override
+    public void delete(Long id) {
+        customerRepository.delete(
+                customerRepository.findById(id).orElseThrow(
+                        ()-> new ResourceNotFoundException("Customer","id",id)
+                )
+        );
+    }
+
+    @Override
+    public Customer getEntityById(Long id) {
+        return customerRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Customer","Id",id));
+    }
+
+
+
+
+}

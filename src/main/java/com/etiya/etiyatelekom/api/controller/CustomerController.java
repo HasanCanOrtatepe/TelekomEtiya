@@ -1,10 +1,9 @@
 package com.etiya.etiyatelekom.api.controller;
 
-import com.etiya.etiyatelekom.api.dto.request.customerRequest.CustomerCreateRequest;
 import com.etiya.etiyatelekom.api.dto.request.customerRequest.CustomerUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.customerResponse.CustomerResponse;
 import com.etiya.etiyatelekom.api.dto.response.customerResponse.CustomerResponseList;
-import com.etiya.etiyatelekom.service.abst.CustomerService;
+import com.etiya.etiyatelekom.business.abst.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -18,11 +17,6 @@ import org.springframework.web.bind.annotation.*;
 public class CustomerController {
 
     private final CustomerService customerService;
-
-    @PostMapping
-    public ResponseEntity<CustomerResponse> create(@Valid @RequestBody CustomerCreateRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(request));
-    }
 
     @PutMapping("/{id}")
     public ResponseEntity<CustomerResponse> update(@PathVariable Long id,

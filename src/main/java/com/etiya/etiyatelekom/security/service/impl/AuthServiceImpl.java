@@ -49,9 +49,12 @@ public class AuthServiceImpl implements AuthService {
             if (agentOpt.isPresent()) {
                 Agent agent = agentOpt.get();
                 if (agent.getIsActive() == null || !agent.getIsActive()) {
-                    throw new InvalidCredentialsException("Account is inactive");
+                    throw new InvalidCredentialsException("Hesap aktif değil");
                 }
-                if (agent.getPassword() != null && passwordEncoder.matches(request.getPassword(), agent.getPassword())) {
+                if (agent.getPassword() == null) {
+                    throw new InvalidCredentialsException("Geçersiz hesap yapılandırması");
+                }
+                if (passwordEncoder.matches(request.getPassword(), agent.getPassword())) {
                     authenticatedUser = AuthenticatedUser.fromAgent(agent);
                 }
             }

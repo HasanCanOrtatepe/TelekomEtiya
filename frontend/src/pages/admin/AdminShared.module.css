@@ -1,0 +1,68 @@
+.page { max-width: 1000px; }
+
+.page h1 { font-size: 1.5rem; color: var(--secondary); margin-bottom: 1.5rem; }
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px var(--border);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(36, 36, 65, 0.15);
+}
+
+.statNumber { display: block; font-size: 2rem; font-weight: 700; color: var(--primary); }
+.statLabel { font-size: 0.9rem; color: var(--secondary-light); }
+
+.tableWrap { overflow-x: auto; background: white; border-radius: 12px; box-shadow: 0 2px 12px var(--border); }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+.table th { background: var(--secondary); color: white; font-weight: 600; font-size: 0.875rem; }
+.table tr:hover { background: #fafafa; }
+.table tr:last-child td { border-bottom: none; }
+
+.btnGroup { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.btnSm { padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; }
+.btnSmPrimary { background: var(--primary); color: white; }
+.btnSmPrimary:hover { background: var(--primary-hover); }
+.btnSmSecondary { background: var(--secondary); color: white; }
+.btnSmSecondary:hover { opacity: 0.9; }
+.btnSmDanger { background: #dc3545; color: white; }
+.btnSmDanger:hover { background: #c82333; }
+
+.modalOverlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: white; padding: 1.5rem; border-radius: 12px;
+  max-width: 420px; width: 90%; max-height: 90vh; overflow-y: auto;
+}
+
+.modal h3 { margin-bottom: 1rem; color: var(--secondary); }
+.modalActions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+.modalActions button { flex: 1; }
+
+.sectionHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.sectionHeader h1, .sectionHeader h2 { font-size: 1.25rem; color: var(--secondary); margin: 0; }
+.error { margin-bottom: 1rem; }
+
+.ticketLink {
+  background: none; border: none; color: var(--primary);
+  font-weight: 600; cursor: pointer; padding: 0; font-size: inherit;
+}
+.ticketLink:hover { text-decoration: underline; }

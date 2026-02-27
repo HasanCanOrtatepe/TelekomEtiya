@@ -53,6 +53,10 @@ public class Ticket {
 
     private OffsetDateTime closedAt;
 
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    @Builder.Default
+    private Boolean isActive = true;
+
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL)
     private List<TicketStatusHistory> statusHistories;
 

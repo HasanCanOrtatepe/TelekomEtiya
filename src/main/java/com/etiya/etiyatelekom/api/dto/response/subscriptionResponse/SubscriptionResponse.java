@@ -18,6 +18,8 @@ public class SubscriptionResponse {
 
     private Integer durationDays;
 
+    private Double price;
+
     private LocalDate activationDate;
 
 }

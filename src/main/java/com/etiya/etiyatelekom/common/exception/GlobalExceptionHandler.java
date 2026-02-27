@@ -7,6 +7,7 @@ import com.etiya.etiyatelekom.common.exception.exceptions.InvalidTicketStatusTra
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceAlreadyExistsException;
 import com.etiya.etiyatelekom.common.exception.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
@@ -17,6 +18,7 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -69,7 +71,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleOther(Exception ex, HttpServletRequest req) {
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", req.getRequestURI(), null);
+        log.error("Unexpected error at {}: {} - {}", req.getRequestURI(), ex.getClass().getSimpleName(), ex.getMessage(), ex);
+        String msg = "Unexpected error";
+        if (ex.getCause() != null) {
+            log.error("Caused by: {}", ex.getCause().getMessage(), ex.getCause());
+        }
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, msg, req.getRequestURI(), null);
     }
 
     private ResponseEntity<ApiError> build(HttpStatus status, String message, String path, Map<String, String> val) {

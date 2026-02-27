@@ -4,5 +4,6 @@ public enum AgentRoleEnums {
 
     AGENT,
     SUPERVISOR,
-    ADMIN
+    ADMIN,
+    SENIOR_AGENT
 }

@@ -11,11 +11,11 @@ import lombok.*;
 @Builder
 public class CustomerSubscriptionPurchaseRequest {
 
-    @NotNull(message = "customerId is required")
-    @Positive(message = "customerId must be positive")
+    @NotNull()
+    @Positive()
     private Long customerId;
 
-    @NotNull(message = "subscriptionId is required")
-    @Positive(message = "subscriptionId must be positive")
+    @NotNull()
+    @Positive()
     private Long subscriptionId;
 }

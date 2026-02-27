@@ -4,12 +4,11 @@ import com.etiya.etiyatelekom.api.dto.request.serviceDomainRequest.ServiceDomain
 import com.etiya.etiyatelekom.api.dto.request.serviceDomainRequest.ServiceDomainUpdateRequest;
 import com.etiya.etiyatelekom.api.dto.response.serviceDomainResponse.ServiceDomainListResponse;
 import com.etiya.etiyatelekom.api.dto.response.serviceDomainResponse.ServiceDomainResponse;
-import com.etiya.etiyatelekom.service.abst.ServiceDomainService;
+import com.etiya.etiyatelekom.business.abst.ServiceDomainService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

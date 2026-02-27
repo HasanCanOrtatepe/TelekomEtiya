@@ -6,7 +6,7 @@ import com.etiya.etiyatelekom.api.dto.request.ticketRequest.TicketUpdateStatusRe
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketListResponse;
 import com.etiya.etiyatelekom.api.dto.response.ticketResponse.TicketResponse;
 import com.etiya.etiyatelekom.common.enums.TicketStatusEnums;
-import com.etiya.etiyatelekom.service.abst.TicketService;
+import com.etiya.etiyatelekom.business.abst.TicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -8,5 +8,10 @@ import java.util.List;
 public interface ComplaintRepository extends JpaRepository<Complaint,Long> {
 
     List<Complaint> findByCustomerId(Long customerId);
+
+    List<Complaint> findByCustomerIdAndIsActiveTrue(Long customerId);
+
+    List<Complaint> findByIsActiveTrue();
+
     boolean existsById(Long id);
 }

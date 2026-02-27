@@ -1,0 +1,12 @@
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px var(--border);
+}
+
+.cardDark {
+  background: var(--secondary);
+  color: white;
+  box-shadow: 0 4px 24px rgba(36, 36, 65, 0.25);
+}

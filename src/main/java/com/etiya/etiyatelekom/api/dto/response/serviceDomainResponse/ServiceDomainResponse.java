@@ -12,4 +12,9 @@ public class ServiceDomainResponse {
     private Long id;
     private String name;
     private Boolean isActive;
+
+    @Override
+    public String toString() {
+        return "id=" + id + ", name='" + name ;
+    }
 }

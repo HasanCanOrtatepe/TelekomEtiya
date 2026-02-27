@@ -2,7 +2,7 @@ package com.etiya.etiyatelekom.api.controller;
 
 import com.etiya.etiyatelekom.api.dto.response.ticketStatusResponse.TicketStatusHistoryListResponse;
 import com.etiya.etiyatelekom.api.dto.response.ticketStatusResponse.TicketStatusHistoryResponse;
-import com.etiya.etiyatelekom.service.abst.TicketStatusHistoryService;
+import com.etiya.etiyatelekom.business.abst.TicketStatusHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
